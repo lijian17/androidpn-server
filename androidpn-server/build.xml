@@ -1,0 +1,73 @@
+<project name="build-androidpn-server" default="build" basedir=".">
+
+	<property file="./build.properties" />
+
+	<!-- Global properties -->
+	<property name="lib.dir" value="lib" />
+	<property name="src.main.java.dir" value="src/main/java" />
+	<property name="src.main.resources.dir" value="src/main/resource" />
+	<property name="src.main.webapp.dir" value="src/main/webapp" />
+	<property name="target.classes.dir" value="target/classes" />
+
+	<!-- Classpath declaration -->
+	<path id="project.classpath">
+		<pathelement path="${target.classes.dir}" />
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+			<include name="**/*.zip" />
+		</fileset>
+		<fileset dir="${maven.repo.dir}">
+			<include name="/commons-logging/commons-logging/1.1.1/*.jar" />
+			<include name="/log4j/log4j/1.2.14/*.jar" />
+			<include name="/org/slf4j/slf4j-api/1.5.8/*.jar" />
+			<include name="/org/slf4j/slf4j-log4j12/1.5.8/*.jar" />
+			<include name="/dom4j/dom4j/1.6.1/*.jar" />
+			<include name="/freemarker/freemarker/2.3.8/*.jar" />
+			<include name="/org/dbunit/dbunit/2.4.5/*.jar" />
+			<include name="/org/hibernate/hibernate-core/3.3.1.GA/*.jar" />
+			<include name="/org/hibernate/hibernate-tools/3.2.3.GA/*.jar" />
+			<include name="/org/hsqldb/hsqldb/1.8.0.10/*.jar" />
+		</fileset>
+	</path>
+
+	<!-- Maven Ant Tasks -->
+	<target name="clean" description="">
+		<ant inheritall="no" antfile="build-maven.xml" target="mvn-clean" />
+	</target>
+
+	<target name="compile" description="">
+		<ant inheritall="no" antfile="build-maven.xml" target="mvn-compile" />
+	</target>
+
+	<target name="test" description="">
+		<ant inheritall="no" antfile="build-maven.xml" target="mvn-test" />
+	</target>
+
+	<target name="install" description="">
+		<ant inheritall="no" antfile="build-maven.xml" target="mvn-install" />
+	</target>
+
+	<target name="assembly" description="">
+		<ant inheritall="no" antfile="build-maven.xml" target="mvn-assembly" />
+	</target>
+
+	<target name="build" depends="clean, assembly" />
+
+	<target name="start" description="">
+		<unzip dest="target">
+			<fileset dir=".">
+				<include name="target/${project.name}-${project.version}-bin.zip" />
+			</fileset>
+		</unzip>
+		<java fork="true" jar="target/${project.name}-${project.version}/lib/starter.jar">
+			<classpath>
+				<pathelement path="target/${project.name}-${project.version}/conf" />
+			</classpath>
+			<jvmarg value="-Dbase.dir=target/${project.name}-${project.version}" />
+			<jvmarg value="-server" />
+		</java>
+	</target>
+	
+	<target name="build-start" depends="build, start" />
+
+</project>

@@ -1,0 +1,71 @@
+<project name="maven-ant-tasks"
+         default=""
+         basedir="."
+         xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+
+	<property file="./build.properties" />
+
+	<!-- Maven Ant Tasks -->
+	<path id="maven-ant-tasks.classpath"
+	      path="lib/maven-ant-tasks-2.0.10.jar" />
+
+	<typedef resource="org/apache/maven/artifact/ant/antlib.xml"
+	         uri="antlib:org.apache.maven.artifact.ant"
+	         classpathref="maven-ant-tasks.classpath" />
+
+	<artifact:remoteRepository id="central.repository"
+	                           url="http://repo1.maven.org/maven2/" />
+
+	<!--
+	<artifact:dependencies pathId="dependency.classpath"
+	                       settingsFile="settings.xml">
+		<dependency groupId="junit"
+		            artifactId="junit"
+		            version="3.8.2"
+		            scope="test" />
+		<dependency groupId="javax.servlet"
+		            artifactId="servlet-api"
+		            version="2.4"
+		            scope="provided" />
+		<remoteRepository refid="central.repository" />
+	</artifact:dependencies>
+	-->
+
+	<artifact:pom id="maven-pom" file="pom.xml" />
+
+	<artifact:dependencies filesetId="maven-deps" pomRefId="maven-pom" />
+	
+	<target name="mvn-clean">
+		<artifact:mvn pom="pom.xml" fork="true">
+			<arg value="clean" />
+		</artifact:mvn>
+	</target>
+
+	<target name="mvn-compile">
+		<artifact:mvn pom="pom.xml" fork="true">
+			<arg value="ccompile" />
+		</artifact:mvn>
+	</target>
+
+	<target name="mvn-test">
+		<artifact:mvn pom="pom.xml" fork="true">
+			<arg value="test" />
+		</artifact:mvn>
+	</target>
+
+	<target name="mvn-install">
+		<artifact:mvn pom="pom.xml" fork="true">
+			<arg value="install" />
+			<!--<localRepository path="${basedir}/target/tmp" />-->
+		</artifact:mvn>
+	</target>
+
+	<target name="mvn-assembly">
+		<artifact:mvn pom="pom.xml" fork="true">
+			<arg value="-P hsqldb" />
+			<arg value="-Dmaven.test.skip=true" />
+			<arg value="assembly:assembly" />
+		</artifact:mvn>
+	</target>
+
+</project>
