@@ -306,8 +306,8 @@
 				<jdbc.version>5.1.6</jdbc.version>
 				<jdbc.driverClassName>com.mysql.jdbc.Driver</jdbc.driverClassName>
 				<jdbc.url><![CDATA[jdbc:mysql://localhost/androidpn?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=utf-8&amp;sessionVariables=FOREIGN_KEY_CHECKS=0]]></jdbc.url>
-				<jdbc.username>androidpn</jdbc.username>
-				<jdbc.password>androidpn</jdbc.password>
+				<jdbc.username>root</jdbc.username>
+				<jdbc.password>root</jdbc.password>
 			</properties>
 		</profile>
 		<profile>

@@ -5,6 +5,14 @@
 
 	<display-name>androidpn-server</display-name>
 
+	<!-- 起始欢迎界面 -->
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
+		<welcome-file>index.do</welcome-file>
+	</welcome-file-list>
+
+	<!-- 读取spring配置文件 -->
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>
@@ -12,6 +20,7 @@
         </param-value>
 	</context-param>
 
+	<!-- Spring字符集过滤器 -->
 	<filter>
 		<filter-name>encodingFilter</filter-name>
 		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
@@ -28,7 +37,6 @@
 		<filter-name>sitemesh</filter-name>
 		<filter-class>com.opensymphony.module.sitemesh.filter.PageFilter</filter-class>
 	</filter>
-
 	<filter-mapping>
 		<filter-name>encodingFilter</filter-name>
 		<url-pattern>/*</url-pattern>
@@ -44,12 +52,14 @@
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
 
+	<!-- springMVC核心配置 -->
 	<servlet>
 		<servlet-name>dispatcher</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
+	<!-- 拦截设置 -->
 	<servlet-mapping>
 		<servlet-name>dispatcher</servlet-name>
 		<url-pattern>*.do</url-pattern>
@@ -59,12 +69,7 @@
 		<session-timeout>30</session-timeout>
 	</session-config>
 
-	<welcome-file-list>
-		<welcome-file>index.html</welcome-file>
-		<welcome-file>index.jsp</welcome-file>
-		<welcome-file>index.do</welcome-file>
-	</welcome-file-list>
-
+	<!-- 错误跳转页面 -->
 	<error-page>
 		<error-code>400</error-code>
 		<location>/index.jsp</location>

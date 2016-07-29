@@ -3,13 +3,13 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>Admin Console</title>
+    <title>管理员控制台</title>
 	<meta name="menu" content="home" />    
 </head>
 
 <body>
 
-<h1>Welcome!</h1>
+<h1>欢迎光临!</h1>
 
 <div style="text-align:center"><img src="/images/androidpn.png" border="0" /></div>
 
