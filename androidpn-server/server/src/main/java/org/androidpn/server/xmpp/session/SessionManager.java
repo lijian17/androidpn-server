@@ -32,186 +32,195 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xmpp.packet.JID;
 
-/** 
- * This class manages the sessions connected to the server.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 连接到服务器的会话管理器
+ * 
+ * @author lijian
+ * @date 2016-7-30 下午4:06:34
  */
 public class SessionManager {
 
-    private static final Log log = LogFactory.getLog(SessionManager.class);
+	private static final Log log = LogFactory.getLog(SessionManager.class);
 
-    private static final String RESOURCE_NAME = "AndroidpnClient";
+	/** 资源名，注意与Android客户端设置的要一致 */
+	private static final String RESOURCE_NAME = "AndroidpnClient";
 
-    private static SessionManager instance;
+	private static SessionManager instance;
 
-    private String serverName;
+	private String serverName;
 
-    private Map<String, ClientSession> preAuthSessions = new ConcurrentHashMap<String, ClientSession>();
+	/** 待认证会话集 */
+	private Map<String, ClientSession> preAuthSessions = new ConcurrentHashMap<String, ClientSession>();
 
-    private Map<String, ClientSession> clientSessions = new ConcurrentHashMap<String, ClientSession>();
+	/** 客户端会话集 */
+	private Map<String, ClientSession> clientSessions = new ConcurrentHashMap<String, ClientSession>();
 
-    private final AtomicInteger connectionsCounter = new AtomicInteger(0);
+	/** 用户会话计数器 */
+	private final AtomicInteger connectionsCounter = new AtomicInteger(0);
 
-    private ClientSessionListener clientSessionListener = new ClientSessionListener();
+	private ClientSessionListener clientSessionListener = new ClientSessionListener();
 
-    private SessionManager() {
-        serverName = XmppServer.getInstance().getServerName();
-    }
+	private SessionManager() {
+		serverName = XmppServer.getInstance().getServerName();
+	}
 
-    /**
-     * Returns the singleton instance of SessionManager.
-     * 
-     * @return the instance
-     */
-    public static SessionManager getInstance() {
-        if (instance == null) {
-            synchronized (SessionManager.class) {
-                instance = new SessionManager();
-            }
-        }
-        return instance;
-    }
+	/**
+	 * 获得会话管理器单例
+	 * 
+	 * @return
+	 */
+	public static SessionManager getInstance() {
+		if (instance == null) {
+			synchronized (SessionManager.class) {
+				instance = new SessionManager();
+			}
+		}
+		return instance;
+	}
 
-    /**
-     * Creates a new ClientSession and returns it.
-     *  
-     * @param conn the connection
-     * @return a newly created session
-     */
-    public ClientSession createClientSession(Connection conn) {
-        if (serverName == null) {
-            throw new IllegalStateException("Server not initialized");
-        }
+	/**
+	 * 根据连接创建一个新的客户端会话并返回
+	 * 
+	 * @param conn
+	 * @return
+	 */
+	public ClientSession createClientSession(Connection conn) {
+		if (serverName == null) {
+			throw new IllegalStateException("服务未初始化");
+		}
 
-        Random random = new Random();
-        String streamId = Integer.toHexString(random.nextInt());
+		Random random = new Random();
+		String streamId = Integer.toHexString(random.nextInt());
 
-        ClientSession session = new ClientSession(serverName, conn, streamId);
-        conn.init(session);
-        conn.registerCloseListener(clientSessionListener);
+		ClientSession session = new ClientSession(serverName, conn, streamId);
+		conn.init(session);
+		conn.registerCloseListener(clientSessionListener);
 
-        // Add to pre-authenticated sessions
-        preAuthSessions.put(session.getAddress().getResource(), session);
+		// 添加到预认证会话集中
+		preAuthSessions.put(session.getAddress().getResource(), session);
 
-        // Increment the counter of user sessions
-        connectionsCounter.incrementAndGet();
+		// 用户会话计数器执行自增
+		connectionsCounter.incrementAndGet();
 
-        log.debug("ClientSession created.");
-        return session;
-    }
+		log.debug("一个客户端会话创建完成.");
+		return session;
+	}
 
-    /**
-     * Adds a new session that has been authenticated. 
-     *  
-     * @param session the session
-     */
-    public void addSession(ClientSession session) {
-        preAuthSessions.remove(session.getStreamID().toString());
-        clientSessions.put(session.getAddress().toString(), session);
-    }
+	/**
+	 * 添加一个已被认证的新会话
+	 * 
+	 * @param session
+	 */
+	public void addSession(ClientSession session) {
+		preAuthSessions.remove(session.getStreamID().toString());
+		clientSessions.put(session.getAddress().toString(), session);
+	}
 
-    /**
-     * Returns the session associated with the username.
-     * 
-     * @param username the username of the client address
-     * @return the session associated with the username
-     */
-    public ClientSession getSession(String username) {
-        // return getSession(new JID(username, serverName, null, true));
-        return getSession(new JID(username, serverName, RESOURCE_NAME, true));
-    }
+	/**
+	 * 根据用户名返回该用户的会话
+	 * 
+	 * @param username
+	 *            客户端地址的用户名
+	 * @return
+	 */
+	public ClientSession getSession(String username) {
+		// return getSession(new JID(username, serverName, null, true));
+		return getSession(new JID(username, serverName, RESOURCE_NAME, true));
+	}
 
-    /**
-     * Returns the session associated with the JID.
-     * 
-     * @param from the client address
-     * @return the session associated with the JID
-     */
-    public ClientSession getSession(JID from) {
-        if (from == null || serverName == null
-                || !serverName.equals(from.getDomain())) {
-            return null;
-        }
-        // Check pre-authenticated sessions
-        if (from.getResource() != null) {
-            ClientSession session = preAuthSessions.get(from.getResource());
-            if (session != null) {
-                return session;
-            }
-        }
-        if (from.getResource() == null || from.getNode() == null) {
-            return null;
-        }
-        return clientSessions.get(from.toString());
-    }
+	/**
+	 * 根据JID返回与之关联的会话
+	 * 
+	 * @param from
+	 * @return
+	 */
+	public ClientSession getSession(JID from) {
+		if (from == null || serverName == null
+				|| !serverName.equals(from.getDomain())) {
+			return null;
+		}
+		// 检查预认证会话
+		if (from.getResource() != null) {
+			ClientSession session = preAuthSessions.get(from.getResource());
+			if (session != null) {
+				return session;
+			}
+		}
+		if (from.getResource() == null || from.getNode() == null) {
+			return null;
+		}
+		return clientSessions.get(from.toString());
+	}
 
-    /**
-     * Returns a list that contains all authenticated client sessions.
-     * 
-     * @return a list that contains all client sessions
-     */
-    public Collection<ClientSession> getSessions() {
-        return clientSessions.values();
-    }
+	/**
+	 * 获得一个包含所有已认证的客户端会话列表
+	 * 
+	 * @return
+	 */
+	public Collection<ClientSession> getSessions() {
+		return clientSessions.values();
+	}
 
-    /**
-     * Removes a client session.
-     * 
-     * @param session the session to be removed
-     * @return true if the session was successfully removed 
-     */
-    public boolean removeSession(ClientSession session) {
-        if (session == null || serverName == null) {
-            return false;
-        }
-        JID fullJID = session.getAddress();
+	/**
+	 * 移除一个客户端会话
+	 * 
+	 * @param session
+	 * @return true：会话成功删除；false：删除失败
+	 */
+	public boolean removeSession(ClientSession session) {
+		if (session == null || serverName == null) {
+			return false;
+		}
+		JID fullJID = session.getAddress();
 
-        // Remove the session from list
-        boolean clientRemoved = clientSessions.remove(fullJID.toString()) != null;
-        boolean preAuthRemoved = (preAuthSessions.remove(fullJID.getResource()) != null);
+		// 从列表中删除会话
+		boolean clientRemoved = clientSessions.remove(fullJID.toString()) != null;
+		boolean preAuthRemoved = (preAuthSessions.remove(fullJID.getResource()) != null);
 
-        // Decrement the counter of user sessions
-        if (clientRemoved || preAuthRemoved) {
-            connectionsCounter.decrementAndGet();
-            return true;
-        }
-        return false;
-    }
+		// 用户会话的计数器执行自减
+		if (clientRemoved || preAuthRemoved) {
+			connectionsCounter.decrementAndGet();
+			return true;
+		}
+		return false;
+	}
 
-    /**
-     * Closes the all sessions. 
-     */
-    public void closeAllSessions() {
-        try {
-            // Send the close stream header to all connections
-            Set<ClientSession> sessions = new HashSet<ClientSession>();
-            sessions.addAll(preAuthSessions.values());
-            sessions.addAll(clientSessions.values());
+	/**
+	 * 关闭所有会话
+	 */
+	public void closeAllSessions() {
+		try {
+			// 发送关闭流到所有连接
+			Set<ClientSession> sessions = new HashSet<ClientSession>();
+			sessions.addAll(preAuthSessions.values());
+			sessions.addAll(clientSessions.values());
 
-            for (ClientSession session : sessions) {
-                try {
-                    session.getConnection().systemShutdown();
-                } catch (Throwable t) {
-                }
-            }
-        } catch (Exception e) {
-        }
-    }
+			for (ClientSession session : sessions) {
+				try {
+					session.getConnection().systemShutdown();
+				} catch (Throwable t) {
+				}
+			}
+		} catch (Exception e) {
+		}
+	}
 
-    /**
-     * A listner to handle a session that has been closed.
-     */
-    private class ClientSessionListener implements ConnectionCloseListener {
+	/**
+	 * 会话关闭监听器
+	 * 
+	 * @author lijian
+	 * @date 2016-7-30 下午4:42:59
+	 */
+	private class ClientSessionListener implements ConnectionCloseListener {
 
-        public void onConnectionClose(Object handback) {
-            try {
-                ClientSession session = (ClientSession) handback;
-                removeSession(session);
-            } catch (Exception e) {
-                log.error("Could not close socket", e);
-            }
-        }
-    }
+		public void onConnectionClose(Object handback) {
+			try {
+				ClientSession session = (ClientSession) handback;
+				removeSession(session);
+			} catch (Exception e) {
+				log.error("无法关闭socket", e);
+			}
+		}
+	}
 
 }

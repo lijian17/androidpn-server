@@ -148,9 +148,13 @@
 		</plugins>
 	</reporting>
 
+	<!-- 构建项目需要的信息 -->
 	<build>
+		<!-- 当项目没有规定目标（Maven2 叫做阶段）时的默认值 --> 
 		<defaultGoal>install</defaultGoal>
+		<!-- 产生的构件的文件名，默认值是${artifactId}-${version}。 -->
 		<finalName>androidpn-server-${version}</finalName>
+		<!-- 子项目可以引用的默认插件信息。该插件配置项直到被引用时才会被解析或绑定到生命周期。给定插件的任何本地配置都会覆盖这里的配置 --> 
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -160,11 +164,15 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+		
+		<!-- 使用的插件列表 。 -->
 		<plugins>
+			<!-- plugin元素包含描述插件所需要的信息。 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.0.2</version>
+				<!-- 作为DOM对象的配置 -->
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
@@ -271,13 +279,20 @@
 				</dependencies>
 			</plugin>
 		</plugins>
+		<!-- 这个元素描述了项目相关的所有资源路径列表，例如和项目相关的属性文件，这些资源被包含在最终的打包文件里。 -->
 		<resources>
+			<!-- 这个元素描述了项目相关或测试相关的所有资源路径 --> 
 			<resource>
+				<!-- 描述存放资源的目录，该路径相对POM路径 --> 
 				<directory>src/main/resources</directory>
+				<!-- 是否使用参数值代替参数名。参数值取自properties元素或者文件里配置的属性，文件在filters元素里列出。 -->
 				<filtering>true</filtering>
 			</resource>
 		</resources>
+		
+		<!-- 这个元素描述了单元测试相关的所有资源路径，例如和单元测试相关的属性文件。 -->
 		<testResources>
+			<!-- 这个元素描述了测试相关的所有资源路径，参见build/resources/resource元素的说明 -->
 			<testResource>
 				<directory>src/test/resources</directory>
 				<filtering>true</filtering>
@@ -294,8 +309,11 @@
 		</testResources>
 	</build>
 
+	<!-- 在列的项目构建profile，如果被激活，会修改构建处理 -->
 	<profiles>
+		<!-- 根据环境参数或命令行参数激活某个构建处理 -->
 		<profile>
+			<!-- 构建配置的唯一标识符。即用于命令行激活，也用于在继承时合并具有相同标识符的profile。 -->
 			<id>mysql</id>
 			<properties>
 				<dbunit.operation.type>CLEAN_INSERT</dbunit.operation.type>
@@ -327,6 +345,7 @@
 		</profile>
 	</profiles>
 
+	<!-- 以值替代名称，Properties可以在整个POM中使用，也可以作为触发条件（见settings.xml配置文件里activation元素的说明）。格式是<name>value</name>。 -->
 	<properties>
 		<dbunit.operation.type>CLEAN_INSERT</dbunit.operation.type>
 		<dbunit.dataTypeFactoryName>org.dbunit.ext.hsqldb.HsqldbDataTypeFactory</dbunit.dataTypeFactoryName>

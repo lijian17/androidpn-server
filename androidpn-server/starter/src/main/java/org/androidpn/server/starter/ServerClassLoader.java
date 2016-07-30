@@ -23,48 +23,53 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-/** 
- * This is a simple classloader to include all jars in a lib directory.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 这是一个简单的类装载器，装载lib目录下所有的jar
+ * 
+ * @author lijian
+ * @date 2016-7-30 下午2:22:54
  */
 public class ServerClassLoader extends URLClassLoader {
 
-    /**
-     * Constructs the classloader.
-     * 
-     * @param parent the parent class loader (or null for none)
-     * @param confDir the directory to load configration files from
-     * @param libDir the directory to load jar files from
-     * @throws java.net.MalformedURLException if the libDir path is not valid
-     */
-    public ServerClassLoader(ClassLoader parent, File confDir, File libDir)
-            throws MalformedURLException {
-        super(new URL[] { confDir.toURI().toURL(), libDir.toURI().toURL() },
-                parent);
+	/**
+	 * 构造函数
+	 * 
+	 * @param parent
+	 *            父类装载器（可为null）
+	 * @param confDir
+	 *            加载配置文件目录
+	 * @param libDir
+	 *            加载jar文件目录
+	 * @throws MalformedURLException
+	 *             如果libDir路径无效，则抛异常
+	 */
+	public ServerClassLoader(ClassLoader parent, File confDir, File libDir)
+			throws MalformedURLException {
+		super(new URL[] { confDir.toURI().toURL(), libDir.toURI().toURL() },
+				parent);
 
-        File[] jars = libDir.listFiles(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                boolean accept = false;
-                String smallName = name.toLowerCase();
-                if (smallName.endsWith(".jar")) {
-                    accept = true;
-                } else if (smallName.endsWith(".zip")) {
-                    accept = true;
-                }
-                return accept;
-            }
-        });
+		File[] jars = libDir.listFiles(new FilenameFilter() {
+			public boolean accept(File dir, String name) {
+				boolean accept = false;
+				String smallName = name.toLowerCase();
+				if (smallName.endsWith(".jar")) {
+					accept = true;
+				} else if (smallName.endsWith(".zip")) {
+					accept = true;
+				}
+				return accept;
+			}
+		});
 
-        if (jars == null) {
-            return;
-        }
+		if (jars == null) {
+			return;
+		}
 
-        for (int i = 0; i < jars.length; i++) {
-            if (jars[i].isFile()) {
-                addURL(jars[i].toURI().toURL());
-            }
-        }
-    }
+		for (int i = 0; i < jars.length; i++) {
+			if (jars[i].isFile()) {
+				addURL(jars[i].toURI().toURL());
+			}
+		}
+	}
 
 }

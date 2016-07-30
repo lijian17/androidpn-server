@@ -29,188 +29,204 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-/** 
- * This class starts the server as a standalone application using Spring configuration.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 使用Spring配置启动服务作为独立应用程序。
+ * 
+ * @author lijian
+ * @date 2016-7-30 下午1:52:47
  */
 public class XmppServer {
 
-    private static final Log log = LogFactory.getLog(XmppServer.class);
+	private static final Log log = LogFactory.getLog(XmppServer.class);
 
-    private static XmppServer instance;
+	private static XmppServer instance;
 
-    private ApplicationContext context;
+	/** Spring上下文对象 */
+	private ApplicationContext context;
 
-    private String version = "0.5.0";
+	/** Androidpn Server 版本号 */
+	private String version = "0.5.0";
 
-    private String serverName;
+	private String serverName;
 
-    private String serverHomeDir;
+	private String serverHomeDir;
 
-    private boolean shuttingDown;
+	private boolean shuttingDown;
 
-    /**
-     * Returns the singleton instance of XmppServer.
-     *
-     * @return the server instance.
-     */
-    public static XmppServer getInstance() {
-        // return instance;
-        if (instance == null) {
-            synchronized (XmppServer.class) {
-                instance = new XmppServer();
-            }
-        }
-        return instance;
-    }
+	/**
+	 * 获得XmppServer实例（单例模式）
+	 * 
+	 * @return
+	 */
+	public static XmppServer getInstance() {
+		if (instance == null) {
+			synchronized (XmppServer.class) {
+				instance = new XmppServer();
+			}
+		}
+		return instance;
+	}
 
-    /**
-     * Constructor. Creates a server and starts it.
-     */
-    public XmppServer() {
-        if (instance != null) {
-            throw new IllegalStateException("A server is already running");
-        }
-        instance = this;
-        start();
-    }
+	/**
+	 * 构造函数：创建一个服务并启动他
+	 */
+	public XmppServer() {
+		if (instance != null) {
+			throw new IllegalStateException("服务已经是运行的");
+		}
+		instance = this;
+		start();
+	}
 
-    /**
-     * Starts the server using Spring configuration.
-     */
-    public void start() {
-        try {
-            if (isStandAlone()) {
-                Runtime.getRuntime().addShutdownHook(new ShutdownHookThread());
-            }
+	/**
+	 * 使用Spring配置启动服务
+	 */
+	public void start() {
+		try {
+			if (isStandAlone()) {
+				Runtime.getRuntime().addShutdownHook(new ShutdownHookThread());
+			}
 
-            locateServer();
-            serverName = Config.getString("xmpp.domain", "127.0.0.1")
-                    .toLowerCase();
-            context = new ClassPathXmlApplicationContext("spring-config.xml");
-            log.info("Spring Configuration loaded.");
+			locateServer();
+			serverName = Config.getString("xmpp.domain", "127.0.0.1")
+					.toLowerCase();
+			context = new ClassPathXmlApplicationContext("spring-config.xml");
+			log.info("加载Spring配置.");
 
-            AdminConsole adminConsole = new AdminConsole(serverHomeDir);
-            adminConsole.startup();
-            if (adminConsole.isHttpStarted()) {
-                log.info("Admin console listening at http://"
-                        + adminConsole.getAdminHost() + ":"
-                        + adminConsole.getAdminPort());
-            }
-            log.info("XmppServer started: " + serverName);
-            log.info("Androidpn Server v" + version);
+			AdminConsole adminConsole = new AdminConsole(serverHomeDir);
+			adminConsole.startup();
+			if (adminConsole.isHttpStarted()) {
+				log.info("Admin console listening at http://"
+						+ adminConsole.getAdminHost() + ":"
+						+ adminConsole.getAdminPort());
+			}
+			log.info("XmppServer started: " + serverName);
+			log.info("Androidpn Server v" + version);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            shutdownServer();
-        }
-    }
+		} catch (Exception e) {
+			e.printStackTrace();
+			shutdownServer();
+		}
+	}
 
-    /**
-     * Stops the server.
-     */
-    public void stop() {
-        shutdownServer();
-        Thread shutdownThread = new ShutdownThread();
-        shutdownThread.setDaemon(true);
-        shutdownThread.start();
-    }
+	/**
+	 * 停止服务
+	 */
+	public void stop() {
+		shutdownServer();
+		Thread shutdownThread = new ShutdownThread();
+		shutdownThread.setDaemon(true);
+		shutdownThread.start();
+	}
 
-    /**
-     * Returns a Spring bean that has the given bean name.
-     *  
-     * @param beanName
-     * @return a Srping bean 
-     */
-    public Object getBean(String beanName) {
-        return context.getBean(beanName);
-    }
+	/**
+	 * 根据beanName获取一个Spring 的bean
+	 * 
+	 * @param beanName
+	 * @return a Srping bean
+	 */
+	public Object getBean(String beanName) {
+		return context.getBean(beanName);
+	}
 
-    /**
-     * Returns the server name.
-     * 
-     * @return the server name
-     */
-    public String getServerName() {
-        return serverName;
-    }
+	/**
+	 * 获得server name.
+	 * 
+	 * @retur
+	 */
+	public String getServerName() {
+		return serverName;
+	}
 
-    /**
-     * Returns true if the server is being shutdown.
-     * 
-     * @return true if the server is being down, false otherwise. 
-     */
-    public boolean isShuttingDown() {
-        return shuttingDown;
-    }
+	/**
+	 * 服务器当前状态
+	 * 
+	 * @return true：服务当前正在关闭，false：otherwise
+	 */
+	public boolean isShuttingDown() {
+		return shuttingDown;
+	}
 
-    /**
-     * Returns if the server is running in standalone mode.
-     * 
-     * @return true if the server is running in standalone mode, false otherwise.
-     */
-    public boolean isStandAlone() {
-        boolean standalone;
-        try {
-            standalone = Class
-                    .forName("org.androidpn.server.starter.ServerStarter") != null;
-        } catch (ClassNotFoundException e) {
-            standalone = false;
-        }
-        return standalone;
-    }
+	/**
+	 * 服务是否是单例模式运行
+	 * 
+	 * @return true：单例模式；false：非单例模式
+	 */
+	public boolean isStandAlone() {
+		boolean standalone;
+		try {
+			standalone = Class
+					.forName("org.androidpn.server.starter.ServerStarter") != null;
+		} catch (ClassNotFoundException e) {
+			standalone = false;
+		}
+		return standalone;
+	}
 
-    private void locateServer() throws FileNotFoundException {
-        String baseDir = System.getProperty("base.dir", "..");
-        log.debug("base.dir=" + baseDir);
+	/**
+	 * 定位服务
+	 * 
+	 * @throws FileNotFoundException
+	 */
+	private void locateServer() throws FileNotFoundException {
+		String baseDir = System.getProperty("base.dir", "..");
+		log.debug("base.dir=" + baseDir);
 
-        if (serverHomeDir == null) {
-            try {
-                File confDir = new File(baseDir, "conf");
-                if (confDir.exists()) {
-                    serverHomeDir = confDir.getParentFile().getCanonicalPath();
-                }
-            } catch (FileNotFoundException fe) {
-                // Ignore
-            } catch (IOException ie) {
-                // Ignore
-            }
-        }
+		if (serverHomeDir == null) {
+			try {
+				File confDir = new File(baseDir, "conf");
+				if (confDir.exists()) {
+					serverHomeDir = confDir.getParentFile().getCanonicalPath();
+				}
+			} catch (FileNotFoundException fe) {
+				// Ignore
+			} catch (IOException ie) {
+				// Ignore
+			}
+		}
 
-        if (serverHomeDir == null) {
-            System.err.println("Could not locate home.");
-            throw new FileNotFoundException();
-        } else {
-            Config.setProperty("server.home.dir", serverHomeDir);
-            log.debug("server.home.dir=" + serverHomeDir);
-        }
-    }
+		if (serverHomeDir == null) {
+			System.err.println("Could not locate home.");
+			throw new FileNotFoundException();
+		} else {
+			Config.setProperty("server.home.dir", serverHomeDir);
+			log.debug("server.home.dir=" + serverHomeDir);
+		}
+	}
 
-    private void shutdownServer() {
-        shuttingDown = true;
-        // Close all connections
-        SessionManager.getInstance().closeAllSessions();
-        log.info("XmppServer stopped");
-    }
+	/**
+	 * 关闭服务器
+	 */
+	private void shutdownServer() {
+		shuttingDown = true;
+		// 关闭所有连接
+		SessionManager.getInstance().closeAllSessions();
+		log.info("XmppServer stopped");
+	}
 
-    private class ShutdownHookThread extends Thread {
-        public void run() {
-            shutdownServer();
-            log.info("Server halted");
-            System.err.println("Server halted");
-        }
-    }
+	private class ShutdownHookThread extends Thread {
+		public void run() {
+			shutdownServer();
+			log.info("Server 停止");
+			System.err.println("Server 停止");
+		}
+	}
 
-    private class ShutdownThread extends Thread {
-        public void run() {
-            try {
-                Thread.sleep(5000);
-                System.exit(0);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-        }
-    }
+	/**
+	 * 关闭线程
+	 * 
+	 * @author lijian
+	 * @date 2016-7-30 下午3:27:56
+	 */
+	private class ShutdownThread extends Thread {
+		public void run() {
+			try {
+				Thread.sleep(5000);
+				System.exit(0);// 0正常关闭当前运行的Java虚拟机
+			} catch (InterruptedException e) {
+				// Ignore
+			}
+		}
+	}
 
 }

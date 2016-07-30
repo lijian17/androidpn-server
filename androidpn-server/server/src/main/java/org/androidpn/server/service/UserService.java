@@ -21,21 +21,22 @@ import java.util.List;
 
 import org.androidpn.server.model.User;
 
-/** 
- * Business service interface for the user management.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 用户管理业务服务接口
+ * 
+ * @author lijian
+ * @date 2016-7-30 下午1:17:02
  */
 public interface UserService {
 
-    public User getUser(String userId);
+	public User getUser(String userId);
 
-    public List<User> getUsers();
+	public List<User> getUsers();
 
-    public User saveUser(User user) throws UserExistsException;
+	public User saveUser(User user) throws UserExistsException;
 
-    public User getUserByUsername(String username) throws UserNotFoundException;
+	public User getUserByUsername(String username) throws UserNotFoundException;
 
-    public void removeUser(Long userId);
+	public void removeUser(Long userId);
 
 }

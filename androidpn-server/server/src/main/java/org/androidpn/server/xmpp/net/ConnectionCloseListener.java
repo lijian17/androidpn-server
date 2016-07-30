@@ -17,18 +17,20 @@
  */
 package org.androidpn.server.xmpp.net;
 
-/** 
- * A listner to receive notification of the connection closing.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 会话连接关闭监听器
+ * 
+ * @author lijian
+ * @date 2016-7-30 下午4:49:24
  */
 public interface ConnectionCloseListener {
 
-    /**
-     * Invoked when a connection is closed.
-     * 
-     * @param handback The handback object
-     */
-    public void onConnectionClose(Object handback);
+	/**
+	 * 当连接关闭时调用
+	 * 
+	 * @param handback
+	 *            The handback object
+	 */
+	public void onConnectionClose(Object handback);
 
 }

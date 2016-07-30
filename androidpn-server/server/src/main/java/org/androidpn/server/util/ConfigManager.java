@@ -22,69 +22,70 @@ import org.apache.commons.configuration.ConfigurationFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/** 
- * This class is to manage the applicatin configruation.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * application配置文件管理类
+ * 
+ * @author lijian
+ * @date 2016-7-30 下午2:44:13
  */
 public class ConfigManager {
 
-    private static final Log log = LogFactory.getLog(ConfigManager.class);
+	private static final Log log = LogFactory.getLog(ConfigManager.class);
 
-    private static Configuration config;
+	private static Configuration config;
 
-    private static ConfigManager instance;
+	private static ConfigManager instance;
 
-    private ConfigManager() {
-        loadConfig();
-    }
+	private ConfigManager() {
+		loadConfig();
+	}
 
-    /**
-     * Returns the singleton instance of ConfigManger.
-     * 
-     * @return the instance
-     */
-    public static ConfigManager getInstance() {
-        if (instance == null) {
-            synchronized (ConfigManager.class) {
-                instance = new ConfigManager();
-            }
-        }
-        return instance;
-    }
+	/**
+	 * 获得单例对象
+	 * 
+	 * @return
+	 */
+	public static ConfigManager getInstance() {
+		if (instance == null) {
+			synchronized (ConfigManager.class) {
+				instance = new ConfigManager();
+			}
+		}
+		return instance;
+	}
 
-    /**
-     * Loads the default configuration file.
-     */
-    public void loadConfig() {
-        loadConfig("config.xml");
-    }
+	/**
+	 * 加载默认配置文件。
+	 */
+	public void loadConfig() {
+		loadConfig("config.xml");
+	}
 
-    /**
-     * Loads the specific configuration file.
-     * 
-     * @param configFileName the file name
-     */
-    public void loadConfig(String configFileName) {
-        try {
-            ConfigurationFactory factory = new ConfigurationFactory(
-                    configFileName);
-            config = factory.getConfiguration();
-            log.info("Configuration loaded: " + configFileName);
-        } catch (Exception ex) {
-            log.error(ex.getMessage(), ex);
-            throw new RuntimeException("Configuration loading error: "
-                    + configFileName, ex);
-        }
-    }
+	/**
+	 * 加载指定配置文件
+	 * 
+	 * @param configFileName
+	 *            这个文件的名称
+	 */
+	public void loadConfig(String configFileName) {
+		try {
+			ConfigurationFactory factory = new ConfigurationFactory(
+					configFileName);
+			config = factory.getConfiguration();
+			log.info("记载配置文件: " + configFileName);
+		} catch (Exception ex) {
+			log.error(ex.getMessage(), ex);
+			throw new RuntimeException("配置文件加载错误: " + configFileName, ex);
+		}
+	}
 
-    /**
-     * Returns the loaded configuration object.
-     * 
-     * @return the configuration
-     */
-    public Configuration getConfig() {
-        return config;
-    }
+	/**
+	 * 获得配置文件对象
+	 * 
+	 * @return
+	 */
+	public Configuration getConfig() {
+		return config;
+	}
 
 }
