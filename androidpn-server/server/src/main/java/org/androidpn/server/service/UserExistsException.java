@@ -17,28 +17,29 @@
  */
 package org.androidpn.server.service;
 
-/** 
- * Thrown if an unique constraint violation occured during saving a user. 
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 如果在保存用户时发生了主键约束冲突，抛异常
+ * 
+ * @author lijian-pc
+ * @date 2016年7月31日 下午5:25:13
  */
 public class UserExistsException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public UserExistsException() {
-        super();
-    }
+	public UserExistsException() {
+		super();
+	}
 
-    public UserExistsException(String message) {
-        super(message);
-    }
+	public UserExistsException(String message) {
+		super(message);
+	}
 
-    public UserExistsException(Throwable cause) {
-        super(cause);
-    }
+	public UserExistsException(Throwable cause) {
+		super(cause);
+	}
 
-    public UserExistsException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public UserExistsException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

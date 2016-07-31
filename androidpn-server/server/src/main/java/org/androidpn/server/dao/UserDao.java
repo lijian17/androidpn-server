@@ -22,23 +22,30 @@ import java.util.List;
 import org.androidpn.server.model.User;
 import org.androidpn.server.service.UserNotFoundException;
 
-/** 
- * User DAO (Data Access Object) interface. 
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * User DAO (Data Access Object) interface.
+ * 
+ * @author lijian-pc
+ * @date 2016年7月31日 下午5:22:41
  */
 public interface UserDao {
 
-    public User getUser(Long id);
+	/** 根据id获取用户 */
+	public User getUser(Long id);
 
-    public User saveUser(User user);
+	/** 保存用户 */
+	public User saveUser(User user);
 
-    public void removeUser(Long id);
+	/** 根据id移除用户 */
+	public void removeUser(Long id);
 
-    public boolean exists(Long id);
+	/** 根据id检测用户是否存在 */
+	public boolean exists(Long id);
 
-    public List<User> getUsers();
+	/** 获取用户集合 */
+	public List<User> getUsers();
 
-    public User getUserByUsername(String username) throws UserNotFoundException;
+	/** 根据用户名获取用户 */
+	public User getUserByUsername(String username) throws UserNotFoundException;
 
 }

@@ -17,28 +17,29 @@
  */
 package org.androidpn.server.service;
 
-/** 
- * Thrown if a requested user could not be loaded.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 如果一个请求的用户无法加载,抛异常
+ * 
+ * @author lijian-pc
+ * @date 2016年7月31日 下午5:23:59
  */
 public class UserNotFoundException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public UserNotFoundException() {
-        super();
-    }
+	public UserNotFoundException() {
+		super();
+	}
 
-    public UserNotFoundException(String message) {
-        super(message);
-    }
+	public UserNotFoundException(String message) {
+		super(message);
+	}
 
-    public UserNotFoundException(Throwable cause) {
-        super(cause);
-    }
+	public UserNotFoundException(Throwable cause) {
+		super(cause);
+	}
 
-    public UserNotFoundException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public UserNotFoundException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }
