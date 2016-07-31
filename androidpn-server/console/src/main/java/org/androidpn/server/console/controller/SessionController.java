@@ -31,67 +31,68 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import org.xmpp.packet.Presence;
 
-/** 
- * A controller class to process the session related requests.  
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 控制器-处理与会话相关请求
+ * 
+ * @author lijian-pc
+ * @date 2016年7月31日 下午2:15:43
  */
 public class SessionController extends MultiActionController {
 
-    //private UserService userService;
+	// private UserService userService;
 
-    public SessionController() {
-        //userService = ServiceLocator.getUserService();
-    }
+	public SessionController() {
+		// userService = ServiceLocator.getUserService();
+	}
 
-    public ModelAndView list(HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-        ClientSession[] sessions = new ClientSession[0];
-        sessions = SessionManager.getInstance().getSessions().toArray(sessions);
+	public ModelAndView list(HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		ClientSession[] sessions = new ClientSession[0];
+		sessions = SessionManager.getInstance().getSessions().toArray(sessions);
 
-        List<SessionVO> voList = new ArrayList<SessionVO>();
-        for (ClientSession sess : sessions) {
-            SessionVO vo = new SessionVO();
-            vo.setUsername(sess.getUsername());
-            vo.setResource(sess.getAddress().getResource());
-            // Status
-            if (sess.getStatus() == Session.STATUS_CONNECTED) {
-                vo.setStatus("CONNECTED");
-            } else if (sess.getStatus() == Session.STATUS_AUTHENTICATED) {
-                vo.setStatus("AUTHENTICATED");
-            } else if (sess.getStatus() == Session.STATUS_CLOSED) {
-                vo.setStatus("CLOSED");
-            } else {
-                vo.setStatus("UNKNOWN");
-            }
-            // Presence
-            if (!sess.getPresence().isAvailable()) {
-                vo.setPresence("Offline");
-            } else {
-                Presence.Show show = sess.getPresence().getShow();
-                if (show == null) {
-                    vo.setPresence("Online");
-                } else if (show == Presence.Show.away) {
-                    vo.setPresence("Away");
-                } else if (show == Presence.Show.chat) {
-                    vo.setPresence("Chat");
-                } else if (show == Presence.Show.dnd) {
-                    vo.setPresence("Do Not Disturb");
-                } else if (show == Presence.Show.xa) {
-                    vo.setPresence("eXtended Away");
-                } else {
-                    vo.setPresence("Unknown");
-                }
-            }
-            vo.setClientIP(sess.getHostAddress());
-            vo.setCreatedDate(sess.getCreationDate());
-            voList.add(vo);
-        }
+		List<SessionVO> voList = new ArrayList<SessionVO>();
+		for (ClientSession sess : sessions) {
+			SessionVO vo = new SessionVO();
+			vo.setUsername(sess.getUsername());
+			vo.setResource(sess.getAddress().getResource());
+			// Status
+			if (sess.getStatus() == Session.STATUS_CONNECTED) {
+				vo.setStatus("CONNECTED");
+			} else if (sess.getStatus() == Session.STATUS_AUTHENTICATED) {
+				vo.setStatus("AUTHENTICATED");
+			} else if (sess.getStatus() == Session.STATUS_CLOSED) {
+				vo.setStatus("CLOSED");
+			} else {
+				vo.setStatus("UNKNOWN");
+			}
+			// Presence
+			if (!sess.getPresence().isAvailable()) {
+				vo.setPresence("Offline");// 离线
+			} else {
+				Presence.Show show = sess.getPresence().getShow();
+				if (show == null) {
+					vo.setPresence("Online");// 在线的
+				} else if (show == Presence.Show.away) {
+					vo.setPresence("Away");// 离开
+				} else if (show == Presence.Show.chat) {
+					vo.setPresence("Chat");// 聊天
+				} else if (show == Presence.Show.dnd) {
+					vo.setPresence("Do Not Disturb");// 请勿打扰
+				} else if (show == Presence.Show.xa) {
+					vo.setPresence("eXtended Away");// 忙碌
+				} else {
+					vo.setPresence("Unknown");// 未知
+				}
+			}
+			vo.setClientIP(sess.getHostAddress());
+			vo.setCreatedDate(sess.getCreationDate());
+			voList.add(vo);
+		}
 
-        ModelAndView mav = new ModelAndView();
-        mav.addObject("sessionList", voList);
-        mav.setViewName("session/list");
-        return mav;
-    }
+		ModelAndView mav = new ModelAndView();
+		mav.addObject("sessionList", voList);
+		mav.setViewName("session/list");
+		return mav;
+	}
 
 }

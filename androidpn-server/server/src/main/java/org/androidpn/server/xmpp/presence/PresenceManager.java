@@ -33,7 +33,7 @@ public class PresenceManager {
 	private SessionManager sessionManager;
 
 	/**
-	 * Constructor.
+	 * 用户出席信息管理类
 	 */
 	public PresenceManager() {
 		sessionManager = SessionManager.getInstance();
