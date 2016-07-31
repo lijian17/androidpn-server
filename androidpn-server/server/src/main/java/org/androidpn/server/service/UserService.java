@@ -29,14 +29,19 @@ import org.androidpn.server.model.User;
  */
 public interface UserService {
 
+	/** 根据id获取用户 */
 	public User getUser(String userId);
 
+	/** 获取用户集合 */
 	public List<User> getUsers();
 
+	/** 保存用户 */
 	public User saveUser(User user) throws UserExistsException;
 
+	/** 根据用户名获取用户 */
 	public User getUserByUsername(String username) throws UserNotFoundException;
 
+	/** 根据id移除用户 */
 	public void removeUser(Long userId);
 
 }
