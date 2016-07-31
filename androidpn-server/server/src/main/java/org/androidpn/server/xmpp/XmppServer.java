@@ -132,7 +132,7 @@ public class XmppServer {
 	/**
 	 * 获得server name.
 	 * 
-	 * @retur
+	 * @return
 	 */
 	public String getServerName() {
 		return serverName;
