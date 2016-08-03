@@ -25,7 +25,14 @@ import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 import org.jivesoftware.openfire.nio.XMLLightweightParser;
 
 /**
- * 解码器
+ * 解码器（继承了累计协议解码器）
+ * 
+ * <pre>
+ * 类，从名字上可以看出累积性的协议解码器，也就是说只要有数据发送过来，这个类就会去读取数据，
+ * 然后累积到内部的IoBuffer 缓冲区，但是具体的拆包（把累积到缓冲区的数据解码为JAVA 对象）
+ * 交由子类的doDecode()方法完成，实际上CumulativeProtocolDecoder就是在decode()
+ * 反复的调用暴漏给子类实现的doDecode()方法。
+ * </pre>
  * 
  * @author lijian
  * @date 2016-7-31 下午10:58:06
@@ -43,11 +50,14 @@ public class XmppDecoder extends CumulativeProtocolDecoder {
 				.getAttribute(XmppIoHandler.XML_PARSER);
 		parser.read(in);
 
+		// 如果有消息
 		if (parser.areThereMsgs()) {
 			for (String stanza : parser.getMsgs()) {
 				out.write(stanza);
 			}
 		}
+
+		// 是否还有剩余
 		return !in.hasRemaining();
 	}
 

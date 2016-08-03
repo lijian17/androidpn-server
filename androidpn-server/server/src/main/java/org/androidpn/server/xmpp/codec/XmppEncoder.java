@@ -21,22 +21,25 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 
-/** 
- *  Encoder class that does nothing (to the already encoded data). 
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * XMPP编码器（继承自协议的编码器）
+ * 
+ * @author lijian
+ * @date 2016-8-3 下午10:27:25
  */
 public class XmppEncoder implements ProtocolEncoder {
 
-    // private final Log log = LogFactory.getLog(XmppEncoder.class);
+	// private final Log log = LogFactory.getLog(XmppEncoder.class);
 
-    public void encode(IoSession session, Object message,
-            ProtocolEncoderOutput out) throws Exception {
-        // log.debug("encode()...");
-    }
+	@Override
+	public void encode(IoSession session, Object message,
+			ProtocolEncoderOutput out) throws Exception {
+		// log.debug("encode()...");
+	}
 
-    public void dispose(IoSession session) throws Exception {
-        // log.debug("dispose()...");
-    }
+	@Override
+	public void dispose(IoSession session) throws Exception {
+		// log.debug("dispose()...");
+	}
 
 }

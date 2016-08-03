@@ -17,29 +17,30 @@
  */
 package org.androidpn.server.xmpp;
 
-/** 
- * Thrown if a user was not authorized to do a particular operation.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 如果一个用户没有被授权做某个特定的操作，将抛异常
+ * 
+ * @author lijian
+ * @date 2016-8-3 下午10:57:14
  */
 public class UnauthorizedException extends Exception {
-    
-    private static final long serialVersionUID = 1L;
 
-    public UnauthorizedException() {
-        super();
-    }
+	private static final long serialVersionUID = 1L;
 
-    public UnauthorizedException(String message) {
-        super(message);
-    }
+	public UnauthorizedException() {
+		super();
+	}
 
-    public UnauthorizedException(Throwable cause) {
-        super(cause);
-    }
+	public UnauthorizedException(String message) {
+		super(message);
+	}
 
-    public UnauthorizedException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public UnauthorizedException(Throwable cause) {
+		super(cause);
+	}
+
+	public UnauthorizedException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
 }

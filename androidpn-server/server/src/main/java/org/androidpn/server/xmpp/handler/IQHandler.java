@@ -26,75 +26,76 @@ import org.xmpp.packet.IQ;
 import org.xmpp.packet.Packet;
 import org.xmpp.packet.PacketError;
 
-/** 
- * This is an abstract class to handle routed IQ packets.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 处理路由的IQ数据包
+ * 
+ * @author lijian
+ * @date 2016-8-3 下午10:42:24
  */
 public abstract class IQHandler {
 
-    protected final Log log = LogFactory.getLog(getClass());
+	protected final Log log = LogFactory.getLog(getClass());
 
-    protected SessionManager sessionManager;
+	protected SessionManager sessionManager;
 
-    /**
-     * Constructor.
-     */
-    public IQHandler() {
-        sessionManager = SessionManager.getInstance();
-    }
+	public IQHandler() {
+		sessionManager = SessionManager.getInstance();
+	}
 
-    /**
-     * Processes the received IQ packet.
-     * 
-     * @param packet the packet
-     */
-    public void process(Packet packet) {
-        IQ iq = (IQ) packet;
-        try {
-            IQ reply = handleIQ(iq);
-            if (reply != null) {
-                PacketDeliverer.deliver(reply);
-            }
-        } catch (UnauthorizedException e) {
-            if (iq != null) {
-                try {
-                    IQ response = IQ.createResultIQ(iq);
-                    response.setChildElement(iq.getChildElement().createCopy());
-                    response.setError(PacketError.Condition.not_authorized);
-                    sessionManager.getSession(iq.getFrom()).process(response);
-                } catch (Exception de) {
-                    log.error("Internal server error", de);
-                    sessionManager.getSession(iq.getFrom()).close();
-                }
-            }
-        } catch (Exception e) {
-            log.error("Internal server error", e);
-            try {
-                IQ response = IQ.createResultIQ(iq);
-                response.setChildElement(iq.getChildElement().createCopy());
-                response.setError(PacketError.Condition.internal_server_error);
-                sessionManager.getSession(iq.getFrom()).process(response);
-            } catch (Exception ex) {
-                // Ignore
-            }
-        }
-    }
+	/**
+	 * 处理接收到的IQ数据包
+	 * 
+	 * @param packet
+	 */
+	public void process(Packet packet) {
+		IQ iq = (IQ) packet;
+		try {
+			IQ reply = handleIQ(iq);
+			if (reply != null) {
+				PacketDeliverer.deliver(reply);
+			}
+		} catch (UnauthorizedException e) {
+			if (iq != null) {
+				try {
+					// 创建一个应答IQ
+					IQ response = IQ.createResultIQ(iq);
+					response.setChildElement(iq.getChildElement().createCopy());
+					response.setError(PacketError.Condition.not_authorized);
+					sessionManager.getSession(iq.getFrom()).process(response);
+				} catch (Exception de) {
+					log.error("内部服务器错误", de);
+					// TODO 这里关闭了会话
+					sessionManager.getSession(iq.getFrom()).close();
+				}
+			}
+		} catch (Exception e) {
+			log.error("内部服务器错误", e);
+			try {
+				IQ response = IQ.createResultIQ(iq);
+				response.setChildElement(iq.getChildElement().createCopy());
+				response.setError(PacketError.Condition.internal_server_error);
+				sessionManager.getSession(iq.getFrom()).process(response);
+			} catch (Exception ex) {
+				// Ignore
+			}
+		}
+	}
 
-    /**
-     * Handles the received IQ packet.
-     * 
-     * @param packet the packet
-     * @return the response to send back
-     * @throws UnauthorizedException if the user is not authorized
-     */
-    public abstract IQ handleIQ(IQ packet) throws UnauthorizedException;
+	/**
+	 * 处理接收到的IQ数据包
+	 * 
+	 * @param packet
+	 * @return
+	 * @throws UnauthorizedException
+	 *             如果用户未被授权
+	 */
+	public abstract IQ handleIQ(IQ packet) throws UnauthorizedException;
 
-    /**
-     * Returns the namespace of the handler.
-     * 
-     * @return the namespace
-     */
-    public abstract String getNamespace();
+	/**
+	 * 获得处理的名称空间
+	 * 
+	 * @return 名称空间
+	 */
+	public abstract String getNamespace();
 
 }

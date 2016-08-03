@@ -17,28 +17,29 @@
  */
 package org.androidpn.server.xmpp;
 
-/** 
- * Thrown if a user was not authenticated to do a particular operation.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 如果一个用户未通过身份验证来做特定操作的话。
+ * 
+ * @author lijian
+ * @date 2016-8-3 下午11:44:01
  */
 public class UnauthenticatedException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public UnauthenticatedException() {
-        super();
-    }
+	public UnauthenticatedException() {
+		super();
+	}
 
-    public UnauthenticatedException(String message) {
-        super(message);
-    }
+	public UnauthenticatedException(String message) {
+		super(message);
+	}
 
-    public UnauthenticatedException(Throwable cause) {
-        super(cause);
-    }
+	public UnauthenticatedException(Throwable cause) {
+		super(cause);
+	}
 
-    public UnauthenticatedException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public UnauthenticatedException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }
