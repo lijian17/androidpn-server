@@ -36,6 +36,7 @@ public abstract class IQHandler {
 
 	protected final Log log = LogFactory.getLog(getClass());
 
+	/** 连接到服务器的会话管理器 */
 	protected SessionManager sessionManager;
 
 	public IQHandler() {

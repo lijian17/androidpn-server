@@ -34,7 +34,7 @@ import org.xmpp.packet.JID;
 import org.xmpp.packet.PacketError;
 
 /**
- * 本类处理TYPE_IQ类型为jabber:iq:auth的协议
+ * 本类处理TYPE_IQ类型为jabber:iq:auth的协议(认证)
  * 
  * @author lijian
  * @date 2016-8-3 下午11:07:46

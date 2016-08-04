@@ -28,77 +28,77 @@ import org.xmpp.packet.Packet;
 import org.xmpp.packet.PacketError;
 import org.xmpp.packet.Presence;
 
-/** 
- * This class is to handle the presence protocol.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 这个类处理出席协议
+ * 
+ * @author lijian
+ * @date 2016-8-4 下午11:11:44
  */
 public class PresenceUpdateHandler {
 
-    protected final Log log = LogFactory.getLog(getClass());
+	protected final Log log = LogFactory.getLog(getClass());
 
-    protected SessionManager sessionManager;
+	/** 连接到服务器的会话管理器 */
+	protected SessionManager sessionManager;
 
-    /**
-     * Constructor.
-     */
-    public PresenceUpdateHandler() {
-        sessionManager = SessionManager.getInstance();
-    }
+	/**
+	 * 这个类处理出席协议.
+	 */
+	public PresenceUpdateHandler() {
+		sessionManager = SessionManager.getInstance();
+	}
 
-    /**
-     * Processes the presence packet.
-     * 
-     * @param packet the packet
-     */
-    public void process(Packet packet) {
-        ClientSession session = sessionManager.getSession(packet.getFrom());
+	/**
+	 * 处理出席数据包
+	 * 
+	 * @param packet
+	 */
+	public void process(Packet packet) {
+		ClientSession session = sessionManager.getSession(packet.getFrom());
 
-        try {
-            Presence presence = (Presence) packet;
-            Presence.Type type = presence.getType();
+		try {
+			Presence presence = (Presence) packet;
+			Presence.Type type = presence.getType();
 
-            if (type == null) { // null == available
-                if (session != null
-                        && session.getStatus() == Session.STATUS_CLOSED) {
-                    log.warn("Rejected available presence: " + presence + " - "
-                            + session);
-                    return;
-                }
+			if (type == null) { // null == available
+				if (session != null
+						&& session.getStatus() == Session.STATUS_CLOSED) {
+					log.warn("有效的出席被拒绝: " + presence + " - " + session);
+					return;
+				}
 
-                if (session != null) {
-                    session.setPresence(presence);
-                    if (!session.isInitialized()) {
-                        // initSession(session);
-                        session.setInitialized(true);
-                    }
-                }
+				if (session != null) {
+					session.setPresence(presence);
+					if (!session.isInitialized()) {
+						// initSession(session);
+						session.setInitialized(true);
+					}
+				}
 
-            } else if (Presence.Type.unavailable == type) {
+			} else if (Presence.Type.unavailable == type) {// 不可用的
 
-                if (session != null) {
-                    session.setPresence(presence);
-                }
+				if (session != null) {
+					session.setPresence(presence);
+				}
 
-            } else {
-                presence = presence.createCopy();
-                if (session != null) {
-                    presence.setFrom(new JID(null, session.getServerName(),
-                            null, true));
-                    presence.setTo(session.getAddress());
-                } else {
-                    JID sender = presence.getFrom();
-                    presence.setFrom(presence.getTo());
-                    presence.setTo(sender);
-                }
-                presence.setError(PacketError.Condition.bad_request);
-                PacketDeliverer.deliver(presence);
-            }
+			} else {
+				presence = presence.createCopy();
+				if (session != null) {
+					presence.setFrom(new JID(null, session.getServerName(),
+							null, true));
+					presence.setTo(session.getAddress());
+				} else {
+					JID sender = presence.getFrom();
+					presence.setFrom(presence.getTo());
+					presence.setTo(sender);
+				}
+				presence.setError(PacketError.Condition.bad_request);
+				PacketDeliverer.deliver(presence);
+			}
 
-        } catch (Exception e) {
-            log.error("Internal server error. Triggered by packet: " + packet,
-                    e);
-        }
-    }
+		} catch (Exception e) {
+			log.error("内部服务器错误. Triggered by packet: " + packet, e);
+		}
+	}
 
 }
