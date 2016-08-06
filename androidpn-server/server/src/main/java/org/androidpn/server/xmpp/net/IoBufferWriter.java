@@ -23,54 +23,62 @@ import java.nio.charset.CharsetEncoder;
 
 import org.apache.mina.core.buffer.IoBuffer;
 
-/** 
- * Wrapper on a MINA {@link IoBuffer} that extends the Writer class.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 包装类-包装在 MINA{@link IoBuffer} 继承自Writer
+ * 
+ * @author lijian
+ * @date 2016-8-6 上午11:30:42
  */
 public class IoBufferWriter extends Writer {
 
-    private CharsetEncoder encoder;
+	/** 字符集编码器 */
+	private CharsetEncoder encoder;
 
-    private IoBuffer ioBuffer;
+	/** IO缓冲区 */
+	private IoBuffer ioBuffer;
 
-    /**
-     * Constructor.
-     * 
-     * @param ioBuffer the IoBuffer
-     * @param encoder the charset encoder
-     */
-    public IoBufferWriter(IoBuffer ioBuffer, CharsetEncoder encoder) {
-        this.encoder = encoder;
-        this.ioBuffer = ioBuffer;
-    }
+	/**
+	 * 包装类-包装在 MINA{@link IoBuffer} 继承自Writer.
+	 * 
+	 * @param ioBuffer
+	 *            IO缓冲区
+	 * @param encoder
+	 *            字符集编码器
+	 */
+	public IoBufferWriter(IoBuffer ioBuffer, CharsetEncoder encoder) {
+		this.encoder = encoder;
+		this.ioBuffer = ioBuffer;
+	}
 
-    /**
-     * Writes a portion of an array of characters.
-     * 
-     * @param cbuf Array of characters
-     * @param off Offset from which to start writing characters
-     * @param len Number of characters to write
-     */
-    @Override
-    public void write(char[] cbuf, int off, int len) throws IOException {
-        ioBuffer.putString(new String(cbuf, off, len), encoder);
-    }
+	/**
+	 * 写入一个字符数组的一部分
+	 * 
+	 * @param cbuf
+	 *            字符数组
+	 * @param off
+	 *            开始位置
+	 * @param len
+	 *            写入长度
+	 */
+	@Override
+	public void write(char[] cbuf, int off, int len) throws IOException {
+		ioBuffer.putString(new String(cbuf, off, len), encoder);
+	}
 
-    /**
-     * Flushes the stream.
-     */
-    @Override
-    public void flush() throws IOException {
-        // Ignore
-    }
+	/**
+	 * 刷新流
+	 */
+	@Override
+	public void flush() throws IOException {
+		// Ignore
+	}
 
-    /**
-     * Closes the stream, flushing it first.
-     */
-    @Override
-    public void close() throws IOException {
-        // Ignore
-    }
+	/**
+	 * 关闭流，并刷新
+	 */
+	@Override
+	public void close() throws IOException {
+		// Ignore
+	}
 
 }
