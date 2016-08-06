@@ -22,24 +22,30 @@ package org.androidpn.server.xmpp;
  *
  * @author Sehwan Noh (devnoh@gmail.com)
  */
+/**
+ * 运行时异常-由失败的数据包操作
+ * 
+ * @author lijian
+ * @date 2016-8-6 下午1:13:55
+ */
 public class PacketException extends RuntimeException {
-    
-    private static final long serialVersionUID = 1L;
 
-    public PacketException() {
-        super();
-    }
+	private static final long serialVersionUID = 1L;
 
-    public PacketException(String message) {
-        super(message);
-    }
+	public PacketException() {
+		super();
+	}
 
-    public PacketException(Throwable cause) {
-        super(cause);
-    }
+	public PacketException(String message) {
+		super(message);
+	}
 
-    public PacketException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public PacketException(Throwable cause) {
+		super(cause);
+	}
+
+	public PacketException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
 }
