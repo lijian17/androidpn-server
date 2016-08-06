@@ -30,63 +30,92 @@ import javax.net.ssl.TrustManagerFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/** 
- * SSL Trust Manager Factory class.
- *
- * @author Sehwan Noh (sehnoh@gmail.com)
+/**
+ * SSL信任管理器工厂类
+ * 
+ * @author lijian
+ * @date 2016-8-6 上午9:20:57
  */
 public class SSLTrustManagerFactory {
 
-    private static final Log log = LogFactory
-            .getLog(SSLTrustManagerFactory.class);
+	private static final Log log = LogFactory
+			.getLog(SSLTrustManagerFactory.class);
 
-    public static TrustManager[] getTrustManagers(String storeType,
-            String truststore, String trustpass)
-            throws NoSuchAlgorithmException, KeyStoreException, IOException,
-            CertificateException {
-        TrustManager[] trustManagers;
-        if (truststore == null) {
-            trustManagers = null;
-        } else {
-            TrustManagerFactory trustFactory = TrustManagerFactory
-                    .getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            if (trustpass == null) {
-                trustpass = "";
-            }
-            KeyStore keyStore = KeyStore.getInstance(storeType);
-            keyStore.load(new FileInputStream(truststore), trustpass
-                    .toCharArray());
-            trustFactory.init(keyStore);
-            trustManagers = trustFactory.getTrustManagers();
-        }
-        return trustManagers;
-    }
+	/**
+	 * 获取Trust管理器集合
+	 * 
+	 * @param storeType
+	 *            存储类型
+	 * @param truststore
+	 *            key库
+	 * @param trustpass
+	 *            key密钥
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 *             没有这样的算法异常
+	 * @throws KeyStoreException
+	 *             密钥库异常
+	 * @throws IOException
+	 *             IO异常
+	 * @throws CertificateException
+	 *             证书异常
+	 */
+	public static TrustManager[] getTrustManagers(String storeType,
+			String truststore, String trustpass)
+			throws NoSuchAlgorithmException, KeyStoreException, IOException,
+			CertificateException {
+		TrustManager[] trustManagers;
+		if (truststore == null) {
+			trustManagers = null;
+		} else {
+			TrustManagerFactory trustFactory = TrustManagerFactory
+					.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+			if (trustpass == null) {
+				trustpass = "";
+			}
+			KeyStore keyStore = KeyStore.getInstance(storeType);
+			keyStore.load(new FileInputStream(truststore),
+					trustpass.toCharArray());
+			trustFactory.init(keyStore);
+			trustManagers = trustFactory.getTrustManagers();
+		}
+		return trustManagers;
+	}
 
-    public static TrustManager[] getTrustManagers(KeyStore truststore,
-            String trustpass) {
-        TrustManager[] trustManagers;
-        try {
-            if (truststore == null) {
-                trustManagers = null;
-            } else {
-                TrustManagerFactory trustFactory = TrustManagerFactory
-                        .getInstance(TrustManagerFactory.getDefaultAlgorithm());
-                if (trustpass == null) {
-                    trustpass = SSLConfig.getc2sTrustPassword();
-                }
+	/**
+	 * 获得Trust管理器集合
+	 * 
+	 * @param truststore
+	 *            Trust库
+	 * @param trustpass
+	 *            Trust密钥
+	 * @return
+	 */
+	public static TrustManager[] getTrustManagers(KeyStore truststore,
+			String trustpass) {
+		TrustManager[] trustManagers;
+		try {
+			if (truststore == null) {
+				trustManagers = null;
+			} else {
+				TrustManagerFactory trustFactory = TrustManagerFactory
+						.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+				if (trustpass == null) {
+					trustpass = SSLConfig.getc2sTrustPassword();
+				}
 
-                trustFactory.init(truststore);
+				trustFactory.init(truststore);
 
-                trustManagers = trustFactory.getTrustManagers();
-            }
-        } catch (KeyStoreException e) {
-            trustManagers = null;
-            log.error("SSLTrustManagerFactory startup problem.", e);
-        } catch (NoSuchAlgorithmException e) {
-            trustManagers = null;
-            log.error("SSLTrustManagerFactory startup problem.", e);
-        }
-        return trustManagers;
-    }
+				trustManagers = trustFactory.getTrustManagers();
+			}
+		} catch (KeyStoreException e) {
+			trustManagers = null;
+			log.error("SSLTrustManagerFactory 启动问题.", e);
+		} catch (NoSuchAlgorithmException e) {
+			trustManagers = null;
+			log.error("SSLTrustManagerFactory 启动问题.", e);
+		}
+		return trustManagers;
+	}
 
 }

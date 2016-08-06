@@ -31,64 +31,95 @@ import javax.net.ssl.KeyManagerFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/** 
- * SSL Key Manager Factory class.  
- *
- * @author Sehwan Noh (sehnoh@gmail.com)
+/**
+ * SSL密钥管理器工厂类
+ * 
+ * @author lijian
+ * @date 2016-8-6 上午9:09:39
  */
 public class SSLKeyManagerFactory {
 
-    private static final Log log = LogFactory
-            .getLog(SSLKeyManagerFactory.class);
+	private static final Log log = LogFactory
+			.getLog(SSLKeyManagerFactory.class);
 
-    public static KeyManager[] getKeyManagers(String storeType,
-            String keystore, String keypass) throws NoSuchAlgorithmException,
-            KeyStoreException, IOException, CertificateException,
-            UnrecoverableKeyException {
-        KeyManager[] keyManagers;
-        if (keystore == null) {
-            keyManagers = null;
-        } else {
-            if (keypass == null) {
-                keypass = "";
-            }
-            KeyStore keyStore = KeyStore.getInstance(storeType);
-            keyStore.load(new FileInputStream(keystore), keypass.toCharArray());
+	/**
+	 * 获得key管理器集合
+	 * 
+	 * @param storeType
+	 *            存储类型
+	 * @param keystore
+	 *            key库
+	 * @param keypass
+	 *            key密钥
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 *             没有这样的算法异常
+	 * @throws KeyStoreException
+	 *             密钥库异常
+	 * @throws IOException
+	 *             IO异常
+	 * @throws CertificateException
+	 *             证书异常
+	 * @throws UnrecoverableKeyException
+	 *             不可恢复的Key异常
+	 */
+	public static KeyManager[] getKeyManagers(String storeType,
+			String keystore, String keypass) throws NoSuchAlgorithmException,
+			KeyStoreException, IOException, CertificateException,
+			UnrecoverableKeyException {
+		KeyManager[] keyManagers;
+		if (keystore == null) {
+			keyManagers = null;
+		} else {
+			if (keypass == null) {
+				keypass = "";
+			}
+			KeyStore keyStore = KeyStore.getInstance(storeType);
+			keyStore.load(new FileInputStream(keystore), keypass.toCharArray());
 
-            KeyManagerFactory keyFactory = KeyManagerFactory
-                    .getInstance(KeyManagerFactory.getDefaultAlgorithm());
-            keyFactory.init(keyStore, keypass.toCharArray());
-            keyManagers = keyFactory.getKeyManagers();
-        }
-        return keyManagers;
-    }
+			KeyManagerFactory keyFactory = KeyManagerFactory
+					.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+			keyFactory.init(keyStore, keypass.toCharArray());
+			keyManagers = keyFactory.getKeyManagers();
+		}
+		return keyManagers;
+	}
 
-    public static KeyManager[] getKeyManagers(KeyStore keystore, String keypass) {
-        KeyManager[] keyManagers;
-        try {
-            if (keystore == null) {
-                keyManagers = null;
-            } else {
-                KeyManagerFactory keyFactory = KeyManagerFactory
-                        .getInstance(KeyManagerFactory.getDefaultAlgorithm());
-                if (keypass == null) {
-                    keypass = SSLConfig.getKeyPassword();
-                }
+	/**
+	 * 获得key管理器集合
+	 * 
+	 * @param keystore
+	 *            key库
+	 * @param keypass
+	 *            key密钥
+	 * @return
+	 */
+	public static KeyManager[] getKeyManagers(KeyStore keystore, String keypass) {
+		KeyManager[] keyManagers;
+		try {
+			if (keystore == null) {
+				keyManagers = null;
+			} else {
+				KeyManagerFactory keyFactory = KeyManagerFactory
+						.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+				if (keypass == null) {
+					keypass = SSLConfig.getKeyPassword();
+				}
 
-                keyFactory.init(keystore, keypass.toCharArray());
-                keyManagers = keyFactory.getKeyManagers();
-            }
-        } catch (KeyStoreException e) {
-            keyManagers = null;
-            log.error("SSLKeyManagerFactory startup problem.", e);
-        } catch (NoSuchAlgorithmException e) {
-            keyManagers = null;
-            log.error("SSLKeyManagerFactory startup problem.", e);
-        } catch (UnrecoverableKeyException e) {
-            keyManagers = null;
-            log.error("SSLKeyManagerFactory startup problem.", e);
-        }
-        return keyManagers;
-    }
+				keyFactory.init(keystore, keypass.toCharArray());
+				keyManagers = keyFactory.getKeyManagers();
+			}
+		} catch (KeyStoreException e) {
+			keyManagers = null;
+			log.error("SSLKeyManagerFactory 启动问题.", e);
+		} catch (NoSuchAlgorithmException e) {
+			keyManagers = null;
+			log.error("SSLKeyManagerFactory 启动问题.", e);
+		} catch (UnrecoverableKeyException e) {
+			keyManagers = null;
+			log.error("SSLKeyManagerFactory 启动问题.", e);
+		}
+		return keyManagers;
+	}
 
 }

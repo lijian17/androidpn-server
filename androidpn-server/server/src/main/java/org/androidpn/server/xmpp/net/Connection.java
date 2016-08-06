@@ -53,27 +53,39 @@ public class Connection {
 
 	private IoSession ioSession;
 
+	/** 这是一个抽象类，用于服务器和客户端之间的会话 */
 	private Session session;
 
+	/** 会话连接关闭监听器 */
 	private ConnectionCloseListener closeListener;
 
+	/** 主版本号 */
 	private int majorVersion = 1;
 
+	/** 小版本号 */
 	private int minorVersion = 0;
 
+	/** 语言 */
 	private String language = null;
 
+	/**
+	 * <pre>
+	 * 安全传输层协议（TLS）用于在两个通信应用程序之间提供保密性和数据完整性。 
+	 * 该协议由两层组成： TLS 记录协议（TLS Record）和 TLS握手协议（TLS Handshake）。
+	 * </per>
+	 */
 	private TLSPolicy tlsPolicy = TLSPolicy.optional;
 
+	/** 本地线程池编码器 */
 	private static ThreadLocal<?> encoder = new ThreadLocalEncoder();
 
+	/** 当前连接的关闭状态 */
 	private boolean closed;
 
 	/**
-	 * Constructor.
+	 * 代表一个连接到服务器的XMPP连接.
 	 * 
 	 * @param ioSession
-	 *            the IoSession
 	 */
 	public Connection(IoSession ioSession) {
 		this.ioSession = ioSession;
@@ -81,7 +93,7 @@ public class Connection {
 	}
 
 	// /**
-	// * Verifies that the connection is still live.
+	// * 验证该连接是否依然存活着
 	// *
 	// * @return true if the socket remains valid, false otherwise.
 	// */
@@ -94,8 +106,7 @@ public class Connection {
 	// }
 
 	/**
-	 * Closes the session including associated socket connection, notifing all
-	 * listeners that the channel is shutting down.
+	 * 关闭session包括相关的socket连接，通知所有 侦听器，该通道正在关闭。
 	 */
 	public void close() {
 		boolean closedSuccessfully = false;
@@ -120,7 +131,7 @@ public class Connection {
 	}
 
 	/**
-	 * Sends notification message indicating that the server is being shutdown.
+	 * 发送一个通知消息，指示该服务器正在被关闭
 	 */
 	public void systemShutdown() {
 		deliverRawText("<stream:error><system-shutdown "
@@ -129,19 +140,19 @@ public class Connection {
 	}
 
 	/**
-	 * Initializes the connection with it's owning session.
+	 * 初始化这个拥有会话的连接
 	 * 
 	 * @param session
-	 *            the session that owns this connection
+	 *            拥有此连接的会话
 	 */
 	public void init(Session session) {
 		this.session = session;
 	}
 
 	/**
-	 * Returns true if the connection is closed.
+	 * 当前连接是否关闭
 	 * 
-	 * @return true if the connection is closed, false otherwise.
+	 * @return true：关闭, false：未关闭.
 	 */
 	public boolean isClosed() {
 		if (session == null) {
@@ -160,10 +171,10 @@ public class Connection {
 	// }
 
 	/**
-	 * Registers a listener for close event notification.
+	 * 注册一个关闭事件通知监听器
 	 * 
 	 * @param listener
-	 *            the listener to register for close events.
+	 *            关闭事件监听器
 	 */
 	public void registerCloseListener(ConnectionCloseListener listener) {
 		if (closeListener != null) {
@@ -177,10 +188,10 @@ public class Connection {
 	}
 
 	/**
-	 * Removes a registered close event listener.
+	 * 移除一个监听器-注册关闭事件
 	 * 
 	 * @param listener
-	 *            the listener to unregister for close events.
+	 *            关闭事件的监听器
 	 */
 	public void unregisterCloseListener(ConnectionCloseListener listener) {
 		if (closeListener == listener) {
@@ -188,24 +199,27 @@ public class Connection {
 		}
 	}
 
+	/**
+	 * 通知关闭监听
+	 */
 	private void notifyCloseListeners() {
 		if (closeListener != null) {
 			try {
 				closeListener.onConnectionClose(session);
 			} catch (Exception e) {
-				log.error("Error notifying listener: " + closeListener, e);
+				log.error("错误通知监听器: " + closeListener, e);
 			}
 		}
 	}
 
 	/**
-	 * Delivers the packet to this connection (without checking the recipient).
+	 * 将此数据包传递给此连接（不检查收件人）
 	 * 
 	 * @param packet
-	 *            the packet to deliver
+	 *            提供的数据包
 	 */
 	public void deliver(Packet packet) {
-		log.debug("SENT: " + packet.toXML());
+		log.debug("发送: " + packet.toXML());
 		if (!isClosed()) {
 			IoBuffer buffer = IoBuffer.allocate(4096);
 			buffer.setAutoExpand(true);
@@ -220,9 +234,7 @@ public class Connection {
 				buffer.flip();
 				ioSession.write(buffer);
 			} catch (Exception e) {
-				log.debug(
-						"Connection: Error delivering packet" + "\n"
-								+ this.toString(), e);
+				log.debug("连接：传递数据包错误" + "\n" + this.toString(), e);
 				errorDelivering = true;
 			}
 			if (errorDelivering) {
@@ -234,20 +246,29 @@ public class Connection {
 	}
 
 	/**
-	 * Delivers raw text to this connection (in asynchronous mode).
+	 * 将原始文本传送到这个连接（异步模式）
 	 * 
 	 * @param text
-	 *            the XML stanza string to deliver
+	 *            XML节点字符串传递
 	 */
 	public void deliverRawText(String text) {
 		deliverRawText(text, true);
 	}
 
+	/**
+	 * 将原始文本传送到这个连接
+	 * 
+	 * @param text
+	 *            XML节点字符串传递
+	 * @param asynchronous
+	 *            是否异步（true：异步；false：同步）
+	 */
 	private void deliverRawText(String text, boolean asynchronous) {
 		log.debug("SENT: " + text);
 		if (!isClosed()) {
+			// 分配一个指定长度的IoBuffer
 			IoBuffer buffer = IoBuffer.allocate(text.length());
-			buffer.setAutoExpand(true);
+			buffer.setAutoExpand(true);// 设置自动扩大
 
 			boolean errorDelivering = false;
 			try {
@@ -256,27 +277,31 @@ public class Connection {
 				if (asynchronous) {
 					ioSession.write(buffer);
 				} else {
-					// Send stanza and wait for ACK
+					// 发送节点，并等待ACK（确认）
 					boolean ok = ioSession.write(buffer).awaitUninterruptibly(
 							Config.getInt("connection.ack.timeout", 2000));
 					if (!ok) {
-						log.warn("No ACK was received when sending stanza to: "
-								+ this.toString());
+						log.warn("发送的节点，无法确认是否有接收到: " + this.toString());
 					}
 				}
 			} catch (Exception e) {
-				log.debug(
-						"Connection: Error delivering raw text" + "\n"
-								+ this.toString(), e);
+				log.debug("连接：错误传递原始文本" + "\n" + this.toString(), e);
 				errorDelivering = true;
 			}
-			// Close the connection if delivering text fails
+			// 如果发送文本失败，关闭连接
 			if (errorDelivering && asynchronous) {
 				close();
 			}
 		}
 	}
 
+	/**
+	 * 启动TLS
+	 * 
+	 * @param authentication
+	 *            认证
+	 * @throws Exception
+	 */
 	public void startTLS(ClientAuth authentication) throws Exception {
 		log.debug("startTLS()...");
 		KeyStore ksKeys = SSLConfig.getKeyStore();
@@ -289,6 +314,7 @@ public class Connection {
 		TrustManager[] tm = SSLTrustManagerFactory.getTrustManagers(ksTrust,
 				trustpass);
 
+		// 根据TLS协议获得一个SSL上下文
 		SSLContext tlsContext = SSLContext.getInstance("TLS");
 		tlsContext.init(km, tm, null);
 
@@ -301,11 +327,11 @@ public class Connection {
 	}
 
 	/**
-	 * Returns the IP address.
+	 * 获得这个IP地址
 	 * 
-	 * @return the IP address
+	 * @return IP地址
 	 * @throws UnknownHostException
-	 *             if IP address of host could not be determined.
+	 *             如果主机的IP地址无法确定
 	 */
 	public String getHostAddress() throws UnknownHostException {
 		return ((InetSocketAddress) ioSession.getRemoteAddress()).getAddress()
@@ -313,11 +339,11 @@ public class Connection {
 	}
 
 	/**
-	 * Gets the host name for the IP address.
+	 * 获取这个IP地址的主机名
 	 * 
-	 * @return the host name for this IP address
+	 * @return IP地址对应的主机名
 	 * @throws UnknownHostException
-	 *             if IP address of host could not be determined.
+	 *             如果主机的IP地址无法确定
 	 */
 	public String getHostName() throws UnknownHostException {
 		return ((InetSocketAddress) ioSession.getRemoteAddress()).getAddress()
@@ -325,30 +351,30 @@ public class Connection {
 	}
 
 	/**
-	 * Returns the major version of XMPP being used by this connection.
+	 * 返回此连接使用的XMPP的主版本
 	 * 
-	 * @return the major XMPP version
+	 * @return XMPP的主版本
 	 */
 	public int getMajorXMPPVersion() {
 		return majorVersion;
 	}
 
 	/**
-	 * Returns the minor version of XMPP being used by this connection.
+	 * 返回此连接使用的XMPP的次版本
 	 * 
-	 * @return the minor XMPP version
+	 * @return XMPP的次版本
 	 */
 	public int getMinorXMPPVersion() {
 		return minorVersion;
 	}
 
 	/**
-	 * Sets the XMPP version information.
+	 * 设置XMPP版本信息
 	 * 
 	 * @param majorVersion
-	 *            the major version
+	 *            主版本
 	 * @param minorVersion
-	 *            the minor version
+	 *            次版本
 	 */
 	public void setXMPPVersion(int majorVersion, int minorVersion) {
 		this.majorVersion = majorVersion;
@@ -356,50 +382,70 @@ public class Connection {
 	}
 
 	/**
-	 * Returns the language code that should be used for this connection.
+	 * 获得应用于此连接的语言码
 	 * 
-	 * @return the language code
+	 * @return 语言码
 	 */
 	public String getLanguage() {
 		return language;
 	}
 
 	/**
-	 * Sets the language code that should be used for this connection.
+	 * 设置应用于此连接的语言码
 	 * 
 	 * @param language
-	 *            the language code
+	 *            语言码
 	 */
 	public void setLanaguage(String language) {
 		this.language = language;
 	}
 
-	@SuppressWarnings("unchecked")
-	private static class ThreadLocalEncoder extends ThreadLocal {
+	/**
+	 * 本地线程编码器
+	 * 
+	 * @author lijian
+	 * @date 2016-8-6 上午8:14:04
+	 */
+	private static class ThreadLocalEncoder extends ThreadLocal<Object> {
+		@Override
 		protected Object initialValue() {
 			return Charset.forName("UTF-8").newEncoder();
 		}
 	}
 
+	/**
+	 * 获得TLS策略
+	 * 
+	 * @return
+	 */
 	public TLSPolicy getTlsPolicy() {
 		return tlsPolicy;
 	}
 
+	/**
+	 * 设置TLS策略
+	 * 
+	 * @param tlsPolicy
+	 */
 	public void setTlsPolicy(TLSPolicy tlsPolicy) {
 		this.tlsPolicy = tlsPolicy;
 	}
 
 	/**
-	 * Enumeration of possible TLS policies required to interact with the
-	 * server.
+	 * 枚举：可能的TLS策略需要与服务器进行交互
+	 * 
+	 * @author lijian
+	 * @date 2016-8-6 上午8:07:44
 	 */
 	public enum TLSPolicy {
 		required, optional, disabled
 	}
 
 	/**
-	 * Enumeration that specifies if clients should be authenticated (and how)
-	 * while negotiating TLS.
+	 * 枚举：指定客户端是否应进行身份认证（以及如何认证），在TLS协商
+	 * 
+	 * @author lijian
+	 * @date 2016-8-6 上午8:04:36
 	 */
 	public enum ClientAuth {
 		disabled, wanted, needed
