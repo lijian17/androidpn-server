@@ -23,78 +23,80 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.logging.StreamHandler;
 
-/** 
- * Class desciption here.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 服务启动
+ * 
+ * @author lijian
+ * @date 2016-8-11 下午9:49:42
  */
 public class ServerStarter {
 
-    private static Logger logger = Logger.getLogger("ServerStarter");
+	private static Logger logger = Logger.getLogger("ServerStarter");
 
-    private static final String DEFAULT_CONF_DIR = "conf";
+	/** 默认配置文件目录 */
+	private static final String DEFAULT_CONF_DIR = "conf";
 
-    private static final String DEFAULT_LIB_DIR = "lib";
+	/** 默认lib库目录 */
+	private static final String DEFAULT_LIB_DIR = "lib";
 
-    public static void main(String[] args) {
-        try {
-            // FileHandler fh = new FileHandler("../logs/starter.log");
-            // fh.setFormatter(new SimpleFormatter());
-            // logger.addHandler(fh);
-            StreamHandler sh = new StreamHandler(System.out,
-                    new SimpleFormatter());
-            logger.addHandler(sh);
-            logger.setLevel(Level.ALL);
-            new ServerStarter().start();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(1);
-        }
-    }
+	public static void main(String[] args) {
+		try {
+			// FileHandler fh = new FileHandler("../logs/starter.log");
+			// fh.setFormatter(new SimpleFormatter());
+			// logger.addHandler(fh);
+			StreamHandler sh = new StreamHandler(System.out,
+					new SimpleFormatter());
+			logger.addHandler(sh);
+			logger.setLevel(Level.ALL);
+			new ServerStarter().start();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			System.exit(1);
+		}
+	}
 
-    @SuppressWarnings("unchecked")
-    private void start() {
-        try {
-            final ClassLoader parent = findParentClassLoader();
+	private void start() {
+		try {
+			final ClassLoader parent = findParentClassLoader();
 
-            String baseDirString = System.getProperty("base.dir", "..");
+			String baseDirString = System.getProperty("base.dir", "..");
 
-            File confDir = new File(baseDirString + File.separator
-                    + DEFAULT_CONF_DIR);
-            if (!confDir.exists()) {
-                throw new RuntimeException("Conf directory "
-                        + confDir.getAbsolutePath() + " does not exist.");
-            }
+			File confDir = new File(baseDirString + File.separator
+					+ DEFAULT_CONF_DIR);
+			if (!confDir.exists()) {
+				throw new RuntimeException("Conf directory "
+						+ confDir.getAbsolutePath() + " does not exist.");
+			}
 
-            File libDir = new File(baseDirString + File.separator
-                    + DEFAULT_LIB_DIR);
-            if (!libDir.exists()) {
-                throw new RuntimeException("Lib directory "
-                        + libDir.getAbsolutePath() + " does not exist.");
-            }
+			File libDir = new File(baseDirString + File.separator
+					+ DEFAULT_LIB_DIR);
+			if (!libDir.exists()) {
+				throw new RuntimeException("Lib directory "
+						+ libDir.getAbsolutePath() + " does not exist.");
+			}
 
-            ClassLoader loader = new ServerClassLoader(parent, confDir, libDir);
+			ClassLoader loader = new ServerClassLoader(parent, confDir, libDir);
 
-            Thread.currentThread().setContextClassLoader(loader);
+			Thread.currentThread().setContextClassLoader(loader);
 
-            Class containerClass = loader
-                    .loadClass("org.androidpn.server.XmppServer");
-            containerClass.newInstance();
+			Class<?> containerClass = loader
+					.loadClass("org.androidpn.server.XmppServer");
+			containerClass.newInstance();
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
-    private ClassLoader findParentClassLoader() {
-        ClassLoader parent = Thread.currentThread().getContextClassLoader();
-        if (parent == null) {
-            parent = this.getClass().getClassLoader();
-            if (parent == null) {
-                parent = ClassLoader.getSystemClassLoader();
-            }
-        }
-        return parent;
-    }
+	private ClassLoader findParentClassLoader() {
+		ClassLoader parent = Thread.currentThread().getContextClassLoader();
+		if (parent == null) {
+			parent = this.getClass().getClassLoader();
+			if (parent == null) {
+				parent = ClassLoader.getSystemClassLoader();
+			}
+		}
+		return parent;
+	}
 
 }

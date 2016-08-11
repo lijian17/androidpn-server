@@ -313,6 +313,7 @@
 	<profiles>
 		<!-- 根据环境参数或命令行参数激活某个构建处理 -->
 		<profile>
+			<activation><activeByDefault>true</activeByDefault></activation>
 			<!-- 构建配置的唯一标识符。即用于命令行激活，也用于在继承时合并具有相同标识符的profile。 -->
 			<id>mysql</id>
 			<properties>

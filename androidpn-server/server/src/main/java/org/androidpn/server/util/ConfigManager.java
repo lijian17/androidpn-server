@@ -72,7 +72,7 @@ public class ConfigManager {
 			ConfigurationFactory factory = new ConfigurationFactory(
 					configFileName);
 			config = factory.getConfiguration();
-			log.info("记载配置文件: " + configFileName);
+			log.info("加载配置文件: " + configFileName);
 		} catch (Exception ex) {
 			log.error(ex.getMessage(), ex);
 			throw new RuntimeException("配置文件加载错误: " + configFileName, ex);
