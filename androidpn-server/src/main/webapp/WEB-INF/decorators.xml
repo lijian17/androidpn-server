@@ -1,0 +1,13 @@
+<decorators defaultdir="/decorators">
+	<excludes>
+		<pattern>/includes/*</pattern>
+		<pattern>/40*.jsp</pattern>
+		<pattern>/dwr/*</pattern>
+	</excludes>
+
+	<!-- 下面配置文件指定了装饰器页面所在的路径，并指定了一个名为default的装饰器，该装饰器默认装饰web应用根路径下的所有页面。 -->
+	<!-- 建立装饰器页面 /decorators/default.jsp -->
+	<decorator name="default" page="default.jsp">
+		<pattern>/*</pattern>
+	</decorator>
+</decorators>
