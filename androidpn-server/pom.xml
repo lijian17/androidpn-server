@@ -7,7 +7,7 @@
 	<!-- 项目坐标 -->
 	<groupId>org.androidpn</groupId>
 	<artifactId>Androidpn</artifactId>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Androidpn-server</name>
 	<url>http://maven.apache.org</url>
@@ -41,14 +41,14 @@
 			<version>3.1.0</version>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>javax.servlet.jsp</groupId>
 			<artifactId>javax.servlet.jsp-api</artifactId>
 			<version>2.3.1</version>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
@@ -261,16 +261,9 @@
 			<artifactId>jetty-sslengine</artifactId>
 			<version>6.1.25</version>
 		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet.jsp</groupId>
-			<artifactId>jsp-api</artifactId>
-			<version>2.1</version>
-		</dependency>
+		<!-- <dependency> <groupId>javax.servlet</groupId> <artifactId>servlet-api</artifactId> 
+			<version>2.5</version> </dependency> <dependency> <groupId>javax.servlet.jsp</groupId> 
+			<artifactId>jsp-api</artifactId> <version>2.1</version> </dependency> -->
 		<dependency>
 			<groupId>jstl</groupId>
 			<artifactId>jstl</artifactId>
@@ -318,26 +311,12 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.tomcat</groupId>
-			<artifactId>jasper</artifactId>
-			<version>6.0.29</version>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.tomcat</groupId>
-					<artifactId>catalina</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.tomcat</groupId>
-					<artifactId>servlet-api</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.tomcat</groupId>
-					<artifactId>jsp-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+		<!-- <dependency> <groupId>org.apache.tomcat</groupId> <artifactId>jasper</artifactId> 
+			<version>6.0.29</version> <scope>provided</scope> <exclusions> <exclusion> 
+			<groupId>org.apache.tomcat</groupId> <artifactId>catalina</artifactId> </exclusion> 
+			<exclusion> <groupId>org.apache.tomcat</groupId> <artifactId>servlet-api</artifactId> 
+			</exclusion> <exclusion> <groupId>org.apache.tomcat</groupId> <artifactId>jsp-api</artifactId> 
+			</exclusion> </exclusions> </dependency> -->
 	</dependencies>
 
 	<!-- 构建配置 -->
@@ -400,9 +379,19 @@
 						<encoding>UTF-8</encoding>
 					</configuration>
 				</plugin>
-				<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-source-plugin</artifactId> 
-					<version>2.1</version> <executions> <execution> <id>attach-sources</id> <goals> 
-					<goal>jar</goal> </goals> </execution> </executions> </plugin> -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>2.1</version>
+					<executions>
+						<execution>
+							<id>attach-sources</id>
+							<goals>
+								<goal>jar</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
 				<plugin>
 					<artifactId>maven-jar-plugin</artifactId>
 					<version>2.3</version>
