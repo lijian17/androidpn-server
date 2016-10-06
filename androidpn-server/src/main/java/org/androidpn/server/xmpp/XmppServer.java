@@ -86,7 +86,7 @@ public class XmppServer {
 				Runtime.getRuntime().addShutdownHook(new ShutdownHookThread());
 			}
 
-//			locateServer();
+			locateServer();
 			serverName = Config.getString("xmpp.domain", "127.0.0.1")
 					.toLowerCase();
 			context = new ClassPathXmlApplicationContext("spring-config.xml");
@@ -168,7 +168,11 @@ public class XmppServer {
 	 * @throws FileNotFoundException
 	 */
 	private void locateServer() throws FileNotFoundException {
-		String baseDir = System.getProperty("base.dir", "..");
+//		String baseDir = System.getProperty("base.dir", "..");
+		String baseDir = System.getProperty("user.dir", "..");
+		baseDir = baseDir + File.separatorChar + "src" + File.separatorChar
+				+ "main" + File.separatorChar + "resources";
+	
 		log.debug("base.dir=" + baseDir);
 
 		if (serverHomeDir == null) {
