@@ -46,6 +46,8 @@ public class ServerStarter {
 					new SimpleFormatter());
 			logger.addHandler(sh);
 			logger.setLevel(Level.ALL);
+			
+			System.out.println("ServerStarter:main----->");
 			new ServerStarter().start();
 		} catch (Exception ex) {
 			ex.printStackTrace();

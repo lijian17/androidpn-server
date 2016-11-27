@@ -168,10 +168,22 @@ public class XmppServer {
 	 * @throws FileNotFoundException
 	 */
 	private void locateServer() throws FileNotFoundException {
-//		String baseDir = System.getProperty("base.dir", "..");
-		String baseDir = System.getProperty("user.dir", "..");
-		baseDir = baseDir + File.separatorChar + "src" + File.separatorChar
-				+ "main" + File.separatorChar + "resources";
+		String path = XmppServer.class.getResource("/").getPath();
+		log.debug("locateServer-path=" + path);
+		
+		String baseDir;
+		if (path.contains("target")) {// 开发环境路径
+			// String baseDir = System.getProperty("base.dir", "..");
+			baseDir = System.getProperty("user.dir", "..");
+			baseDir = baseDir + File.separatorChar + "src" + File.separatorChar
+					+ "main" + File.separatorChar + "resources";
+		} else {// 生产环境路径
+			String websiteURL = path.replace("/build/classes", "")
+					.replace("/classes", "").replace("%20", " ")
+					.replaceFirst("/", "");
+			log.debug("locateServer-websiteURL=" + websiteURL);
+			baseDir = websiteURL;
+		}
 	
 		log.debug("base.dir=" + baseDir);
 
