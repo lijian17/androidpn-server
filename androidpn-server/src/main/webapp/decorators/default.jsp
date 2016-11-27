@@ -5,8 +5,8 @@
 <head>
 	<title><decorator:title/></title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-	<link rel="stylesheet" type="text/css" href="<c:url value='/styles/console.css'/>" />
-	<script type="text/javascript" src="<c:url value='/scripts/jquery.js'/>"></script>
+	<link rel="stylesheet" type="text/css" href="<c:url value='./styles/console.css'/>" />
+	<script type="text/javascript" src="<c:url value='./scripts/jquery.js'/>"></script>
 	<decorator:head/>
 </head>
 <c:set var="topMenu" scope="request"><decorator:getProperty property="meta.menu"/></c:set>			

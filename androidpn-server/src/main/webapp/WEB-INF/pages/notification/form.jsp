@@ -13,7 +13,7 @@
 
 <%--<div style="background:#eee; margin:20px 0px; padding:20px; width:500px; border:solid 1px #999;">--%>
 <div style="margin:20px 0px;">
-<form action="notification.do?action=send" method="post" style="margin: 0px;">
+<form action="./notification.do?action=send" method="post" style="margin: 0px;">
 <table width="600" cellpadding="4" cellspacing="0" border="0">
 <tr>
 	<td width="20%">发送给:</td>
