@@ -17,10 +17,11 @@
  */
 package org.androidpn.server.service;
 
-/** 
- * Thrown if a requested user could not be loaded.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 如果一个请求的用户无法加载,抛异常
+ * 
+ * @author lijian
+ * @date 2016-12-3 下午11:41:04
  */
 public class UserNotFoundException extends Exception {
 

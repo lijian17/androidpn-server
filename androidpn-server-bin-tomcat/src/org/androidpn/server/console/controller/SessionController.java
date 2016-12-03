@@ -31,10 +31,11 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import org.xmpp.packet.Presence;
 
-/** 
- * A controller class to process the session related requests.  
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 控制器-处理与会话相关请求
+ * 
+ * @author lijian
+ * @date 2016-12-3 下午11:25:41
  */
 public class SessionController extends MultiActionController {
 
@@ -66,21 +67,21 @@ public class SessionController extends MultiActionController {
             }
             // Presence
             if (!sess.getPresence().isAvailable()) {
-                vo.setPresence("Offline");
+                vo.setPresence("Offline");// 离线
             } else {
                 Presence.Show show = sess.getPresence().getShow();
                 if (show == null) {
-                    vo.setPresence("Online");
+                    vo.setPresence("Online");// 在线的
                 } else if (show == Presence.Show.away) {
-                    vo.setPresence("Away");
+                    vo.setPresence("Away");// 离开
                 } else if (show == Presence.Show.chat) {
-                    vo.setPresence("Chat");
+                    vo.setPresence("Chat");// 聊天
                 } else if (show == Presence.Show.dnd) {
-                    vo.setPresence("Do Not Disturb");
+                    vo.setPresence("Do Not Disturb");// 请勿打扰
                 } else if (show == Presence.Show.xa) {
-                    vo.setPresence("eXtended Away");
+                    vo.setPresence("eXtended Away");// 忙碌
                 } else {
-                    vo.setPresence("Unknown");
+                    vo.setPresence("Unknown");// 未知
                 }
             }
             vo.setClientIP(sess.getHostAddress());

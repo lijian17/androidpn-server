@@ -24,10 +24,11 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-/** 
- * This class starts the server as a standalone application using Spring configuration.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 使用Spring配置启动服务作为独立应用程序。
+ * 
+ * @author lijian
+ * @date 2016-12-3 下午11:48:16
  */
 public class XmppServer {
 
@@ -35,8 +36,10 @@ public class XmppServer {
 
     private static XmppServer instance;
 
+	/** Spring上下文对象 */
     private ApplicationContext context;
 
+	/** Androidpn Server 版本号 */
     private String version = "0.5.0";
 
     private String serverName;
@@ -45,13 +48,12 @@ public class XmppServer {
 
     private boolean shuttingDown;
 
-    /**
-     * Returns the singleton instance of XmppServer.
-     *
-     * @return the server instance.
-     */
+	/**
+	 * 获得XmppServer实例（单例模式）
+	 * 
+	 * @return
+	 */
     public static XmppServer getInstance() {
-        // return instance;
         if (instance == null) {
             synchronized (XmppServer.class) {
                 instance = new XmppServer();
@@ -60,20 +62,20 @@ public class XmppServer {
         return instance;
     }
 
-    /**
-     * Constructor. Creates a server and starts it.
-     */
+	/**
+	 * 构造函数：创建一个服务并启动他
+	 */
     public XmppServer() {
         if (instance != null) {
-            throw new IllegalStateException("A server is already running");
+			throw new IllegalStateException("服务已经是运行的");
         }
         instance = this;
         start();
     }
 
-    /**
-     * Starts the server using Spring configuration.
-     */
+	/**
+	 * 使用Spring配置启动服务
+	 */
     public void start() {
         try {
             if (isStandAlone()) {
@@ -84,7 +86,7 @@ public class XmppServer {
             serverName = Config.getString("xmpp.domain", "127.0.0.1")
                     .toLowerCase();
             context = new ClassPathXmlApplicationContext("spring-config.xml");
-            log.info("Spring Configuration loaded.");
+			log.info("加载Spring配置.");
 
 //            AdminConsole adminConsole = new AdminConsole(serverHomeDir);
 //            adminConsole.startup();
@@ -102,9 +104,9 @@ public class XmppServer {
         }
     }
 
-    /**
-     * Stops the server.
-     */
+	/**
+	 * 停止服务
+	 */
     public void stop() {
         shutdownServer();
         Thread shutdownThread = new ShutdownThread();
@@ -113,38 +115,38 @@ public class XmppServer {
     }
 
     /**
-     * Returns a Spring bean that has the given bean name.
-     *  
-     * @param beanName
-     * @return a Srping bean 
-     */
+	 * 根据beanName获取一个Spring 的bean
+	 * 
+	 * @param beanName
+	 * @return a Srping bean
+	 */
     public Object getBean(String beanName) {
         return context.getBean(beanName);
     }
 
-    /**
-     * Returns the server name.
-     * 
-     * @return the server name
-     */
+	/**
+	 * 获得server name.
+	 * 
+	 * @return
+	 */
     public String getServerName() {
         return serverName;
     }
 
     /**
-     * Returns true if the server is being shutdown.
-     * 
-     * @return true if the server is being down, false otherwise. 
-     */
+	 * 服务器当前状态
+	 * 
+	 * @return true：服务当前正在关闭，false：otherwise
+	 */
     public boolean isShuttingDown() {
         return shuttingDown;
     }
 
     /**
-     * Returns if the server is running in standalone mode.
-     * 
-     * @return true if the server is running in standalone mode, false otherwise.
-     */
+	 * 服务是否是单例模式运行
+	 * 
+	 * @return true：单例模式；false：非单例模式
+	 */
     public boolean isStandAlone() {
         boolean standalone;
         try {
@@ -156,11 +158,36 @@ public class XmppServer {
         return standalone;
     }
 
-/*    private void locateServer() throws FileNotFoundException {
-    	Context context = new WebAppContext(contexts, homeDir + File.separator
-                + );
-        String baseDir = "F:/Java���/Ӧ�����/Tomcat 6.0/webapps/ROOT";
-        log.debug("base.dir=" + baseDir);
+	/**
+	 * 定位服务
+	 * 
+	 * @throws FileNotFoundException
+	 *//*
+    private void locateServer() throws FileNotFoundException {
+
+		String path = XmppServer.class.getResource("/").getPath();
+		log.debug("locateServer-path=" + path);
+		
+		String baseDir;
+		if (path.contains("target")) {// 开发环境路径
+			// String baseDir = System.getProperty("base.dir", "..");
+			baseDir = System.getProperty("user.dir", "..");
+			baseDir = baseDir + File.separatorChar + "src" + File.separatorChar
+					+ "main" + File.separatorChar + "resources";
+		} else {// 生产环境路径
+			String websiteURL = path.replace("/build/classes", "")
+					.replace("/classes", "").replace("%20", " ")
+					.replaceFirst("/", "");
+			log.debug("locateServer-websiteURL=" + websiteURL);
+			baseDir = websiteURL;
+		}
+	
+		log.debug("base.dir=" + baseDir);
+		
+//    	Context context = new WebAppContext(contexts, homeDir + File.separator
+//                + );
+//        String baseDir = "F:/Java���/Ӧ�����/Tomcat 6.0/webapps/ROOT";
+//        log.debug("base.dir=" + baseDir);
 
         if (serverHomeDir == null) {
             try {
@@ -184,9 +211,12 @@ public class XmppServer {
         }
     }*/
 
+	/**
+	 * 关闭服务器
+	 */
     private void shutdownServer() {
         shuttingDown = true;
-        // Close all connections
+		// 关闭所有连接
         SessionManager.getInstance().closeAllSessions();
         log.info("XmppServer stopped");
     }
@@ -194,16 +224,22 @@ public class XmppServer {
     private class ShutdownHookThread extends Thread {
         public void run() {
             shutdownServer();
-            log.info("Server halted");
-            System.err.println("Server halted");
+			log.info("Server 停止");
+			System.err.println("Server 停止");
         }
     }
 
+    /**
+     * 关闭线程
+     * 
+     * @author lijian
+     * @date 2016-12-3 下午11:56:08
+     */
     private class ShutdownThread extends Thread {
         public void run() {
             try {
                 Thread.sleep(5000);
-                System.exit(0);
+                System.exit(0);// 0正常关闭当前运行的Java虚拟机
             } catch (InterruptedException e) {
                 // Ignore
             }

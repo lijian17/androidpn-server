@@ -29,10 +29,11 @@ import org.androidpn.server.xmpp.presence.PresenceManager;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 
-/** 
- * A controller class to process the user related requests.  
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 控制器-处理与用户相关请求
+ * 
+ * @author lijian
+ * @date 2016-12-3 下午11:27:00
  */
 public class UserController extends MultiActionController {
 

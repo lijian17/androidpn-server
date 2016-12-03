@@ -19,30 +19,32 @@ package org.androidpn.server.service;
 
 import org.androidpn.server.xmpp.XmppServer;
 
-/** 
- * This is a helper class to look up service objects.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 工具类-获取服务对象
+ * 
+ * @author lijian
+ * @date 2016-12-3 下午11:39:19
  */
 public class ServiceLocator {
 
     public static String USER_SERVICE = "userService";
 
-    /**
-     * Generic method to obtain a service object for a given name. 
-     * 
-     * @param name the service bean name
-     * @return
-     */
+	/**
+	 * 根据名称获取一个服务对象
+	 * 
+	 * @param name
+	 *            服务的名称
+	 * @return
+	 */
     public static Object getService(String name) {
         return XmppServer.getInstance().getBean(name);
     }
 
-    /**
-     * Obtains the user service.
-     * 
-     * @return the user service
-     */
+	/**
+	 * 获得用户服务
+	 * 
+	 * @return
+	 */
     public static UserService getUserService() {
         return (UserService) XmppServer.getInstance().getBean(USER_SERVICE);
     }

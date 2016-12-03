@@ -19,26 +19,27 @@ package org.androidpn.server.xmpp.router;
 
 import org.xmpp.packet.Message;
 
-/** 
- * This class is to route Message packets to their corresponding handler.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * Message路由
+ * 
+ * @author lijian
+ * @date 2016-12-4 上午12:35:41
  */
 public class MessageRouter {
 
-    /**
-     * Constucts a packet router.
-     */
-    public MessageRouter() {
-    }
+	/**
+	 * Message路由
+	 */
+	public MessageRouter() {
+	}
 
-    /**
-     * Routes the Message packet.
-     * 
-     * @param packet the packet to route
-     */
-    public void route(Message packet) {
-        throw new RuntimeException("Please implement this!");
-    }
+	/**
+	 * 路由这个Message包
+	 * 
+	 * @param packet
+	 */
+	public void route(Message packet) {
+		throw new RuntimeException("请实现这个！");
+	}
 
 }

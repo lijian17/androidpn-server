@@ -31,16 +31,38 @@ import javax.net.ssl.KeyManagerFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/** 
- * SSL Key Manager Factory class.  
- *
- * @author Sehwan Noh (sehnoh@gmail.com)
+/**
+ * SSL密钥管理器工厂类
+ * 
+ * @author lijian
+ * @date 2016-12-4 上午12:46:27
  */
 public class SSLKeyManagerFactory {
 
     private static final Log log = LogFactory
             .getLog(SSLKeyManagerFactory.class);
 
+	/**
+	 * 获得key管理器集合
+	 * 
+	 * @param storeType
+	 *            存储类型
+	 * @param keystore
+	 *            key库
+	 * @param keypass
+	 *            key密钥
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 *             没有这样的算法异常
+	 * @throws KeyStoreException
+	 *             密钥库异常
+	 * @throws IOException
+	 *             IO异常
+	 * @throws CertificateException
+	 *             证书异常
+	 * @throws UnrecoverableKeyException
+	 *             不可恢复的Key异常
+	 */
     public static KeyManager[] getKeyManagers(String storeType,
             String keystore, String keypass) throws NoSuchAlgorithmException,
             KeyStoreException, IOException, CertificateException,
@@ -63,6 +85,15 @@ public class SSLKeyManagerFactory {
         return keyManagers;
     }
 
+	/**
+	 * 获得key管理器集合
+	 * 
+	 * @param keystore
+	 *            key库
+	 * @param keypass
+	 *            key密钥
+	 * @return
+	 */
     public static KeyManager[] getKeyManagers(KeyStore keystore, String keypass) {
         KeyManager[] keyManagers;
         try {
@@ -79,15 +110,15 @@ public class SSLKeyManagerFactory {
                 keyManagers = keyFactory.getKeyManagers();
             }
         } catch (KeyStoreException e) {
-            keyManagers = null;
-            log.error("SSLKeyManagerFactory startup problem.", e);
-        } catch (NoSuchAlgorithmException e) {
-            keyManagers = null;
-            log.error("SSLKeyManagerFactory startup problem.", e);
-        } catch (UnrecoverableKeyException e) {
-            keyManagers = null;
-            log.error("SSLKeyManagerFactory startup problem.", e);
-        }
+			keyManagers = null;
+			log.error("SSLKeyManagerFactory 启动问题.", e);
+		} catch (NoSuchAlgorithmException e) {
+			keyManagers = null;
+			log.error("SSLKeyManagerFactory 启动问题.", e);
+		} catch (UnrecoverableKeyException e) {
+			keyManagers = null;
+			log.error("SSLKeyManagerFactory 启动问题.", e);
+		}
         return keyManagers;
     }
 

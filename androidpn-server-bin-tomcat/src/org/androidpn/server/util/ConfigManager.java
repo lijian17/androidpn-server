@@ -22,10 +22,11 @@ import org.apache.commons.configuration.ConfigurationFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/** 
- * This class is to manage the applicatin configruation.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * application配置文件管理类
+ * 
+ * @author lijian
+ * @date 2016-12-3 下午11:44:48
  */
 public class ConfigManager {
 
@@ -39,11 +40,11 @@ public class ConfigManager {
         loadConfig();
     }
 
-    /**
-     * Returns the singleton instance of ConfigManger.
-     * 
-     * @return the instance
-     */
+	/**
+	 * 获得单例对象
+	 * 
+	 * @return
+	 */
     public static ConfigManager getInstance() {
         if (instance == null) {
             synchronized (ConfigManager.class) {
@@ -54,35 +55,35 @@ public class ConfigManager {
     }
 
     /**
-     * Loads the default configuration file.
+     * 加载默认配置文件。
      */
     public void loadConfig() {
         loadConfig("config.xml");
     }
 
-    /**
-     * Loads the specific configuration file.
-     * 
-     * @param configFileName the file name
-     */
+	/**
+	 * 加载指定配置文件
+	 * 
+	 * @param configFileName
+	 *            这个文件的名称
+	 */
     public void loadConfig(String configFileName) {
-        try {
-            ConfigurationFactory factory = new ConfigurationFactory(
-                    configFileName);
-            config = factory.getConfiguration();
-            log.info("Configuration loaded: " + configFileName);
-        } catch (Exception ex) {
-            log.error(ex.getMessage(), ex);
-            throw new RuntimeException("Configuration loading error: "
-                    + configFileName, ex);
-        }
-    }
+		try {
+			ConfigurationFactory factory = new ConfigurationFactory(
+					configFileName);
+			config = factory.getConfiguration();
+			log.info("加载配置文件: " + configFileName);
+		} catch (Exception ex) {
+			log.error(ex.getMessage(), ex);
+			throw new RuntimeException("配置文件加载错误: " + configFileName, ex);
+		}
+	}
 
-    /**
-     * Returns the loaded configuration object.
-     * 
-     * @return the configuration
-     */
+	/**
+	 * 获得配置文件对象
+	 * 
+	 * @return
+	 */
     public Configuration getConfig() {
         return config;
     }

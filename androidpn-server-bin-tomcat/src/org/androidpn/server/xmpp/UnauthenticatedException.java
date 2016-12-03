@@ -17,10 +17,11 @@
  */
 package org.androidpn.server.xmpp;
 
-/** 
- * Thrown if a user was not authenticated to do a particular operation.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 如果一个用户未通过身份验证来做特定操作的话。
+ * 
+ * @author lijian
+ * @date 2016-12-3 下午11:47:45
  */
 public class UnauthenticatedException extends Exception {
 

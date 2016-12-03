@@ -27,231 +27,244 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Presence;
 
-/** 
- * This class represents a session between the server and a client.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 服务端与客户端的一个会话
+ * 
+ * @author lijian
+ * @date 2016-12-4 上午12:38:02
  */
 public class ClientSession extends Session {
 
-    private static final Log log = LogFactory.getLog(ClientSession.class);
+	private static final Log log = LogFactory.getLog(ClientSession.class);
 
-    private static final String ETHERX_NAMESPACE = "http://etherx.jabber.org/streams";
+	private static final String ETHERX_NAMESPACE = "http://etherx.jabber.org/streams";
 
-    private AuthToken authToken;
+	private AuthToken authToken;
 
-    private boolean initialized;
+	private boolean initialized;
 
-    private boolean wasAvailable = false;
+	private boolean wasAvailable = false;
 
-    private Presence presence = null;
+	/** 出席对象 */
+	private Presence presence = null;
 
-    /**
-     * Constructor.
-     * 
-     * @param serverName the server name
-     * @param connection the connection
-     * @param streamID the stream ID
-     */
-    public ClientSession(String serverName, Connection connection,
-            String streamID) {
-        super(serverName, connection, streamID);
-        presence = new Presence();
-        presence.setType(Presence.Type.unavailable);
-    }
+	/**
+	 * 根据服务名和流ID，创建一个JID
+	 * 
+	 * @param serverName
+	 *            服务名
+	 * @param connection
+	 *            连接
+	 * @param streamID
+	 *            流ID
+	 */
+	public ClientSession(String serverName, Connection connection,
+			String streamID) {
+		super(serverName, connection, streamID);
+		presence = new Presence();
+		presence.setType(Presence.Type.unavailable);// 默认为不可用的
+	}
 
-    /**
-     * Creates a new session between the server and a client, and returns it.
-     * 
-     * @param serverName the server name
-     * @param connection the connection
-     * @param xpp the XML parser to handle incoming data 
-     * @return a newly created session
-     * @throws XmlPullParserException if an error occurs while parsing incoming data
-     */
-    public static ClientSession createSession(String serverName,
-            Connection connection, XmlPullParser xpp)
-            throws XmlPullParserException {
-        log.debug("createSession()...");
+	/**
+	 * 在服务器和客户端之间创建一个新的会话，并返回它。
+	 * 
+	 * @param serverName
+	 *            服务名
+	 * @param connection
+	 *            连接
+	 * @param xpp
+	 *            XML解析器来处理传入的数据
+	 * @return 一个新创建的会话
+	 * @throws XmlPullParserException
+	 *             如果解析传入的数据时发生错误
+	 */
+	public static ClientSession createSession(String serverName,
+			Connection connection, XmlPullParser xpp)
+			throws XmlPullParserException {
+		log.debug("createSession()...");
 
-        if (!xpp.getName().equals("stream")) {
-            throw new XmlPullParserException("Bad opening tag (not stream)");
-        }
+		if (!xpp.getName().equals("stream")) {
+			throw new XmlPullParserException("坏的开始标签 (not stream)");
+		}
 
-        if (!xpp.getNamespace(xpp.getPrefix()).equals(ETHERX_NAMESPACE)) {
-            throw new XmlPullParserException("Stream not in correct namespace");
-        }
+		if (!xpp.getNamespace(xpp.getPrefix()).equals(ETHERX_NAMESPACE)) {
+			throw new XmlPullParserException("不正确的名称空间的流");
+		}
 
-        String language = "en";
-        for (int i = 0; i < xpp.getAttributeCount(); i++) {
-            if ("lang".equals(xpp.getAttributeName(i))) {
-                language = xpp.getAttributeValue(i);
-            }
-        }
+		String language = "en";
+		for (int i = 0; i < xpp.getAttributeCount(); i++) {
+			if ("lang".equals(xpp.getAttributeName(i))) {
+				language = xpp.getAttributeValue(i);
+			}
+		}
 
-        // Store language and version information
-        connection.setLanaguage(language);
-        connection.setXMPPVersion(MAJOR_VERSION, MINOR_VERSION);
+		// 存储语言和版本信息
+		connection.setLanaguage(language);
+		connection.setXMPPVersion(MAJOR_VERSION, MINOR_VERSION);
 
-        // Create a ClientSession
-        ClientSession session = SessionManager.getInstance()
-                .createClientSession(connection);
+		// 创建一个ClientSession
+		ClientSession session = SessionManager.getInstance()
+				.createClientSession(connection);
 
-        // Build the start packet response
-        StringBuilder sb = new StringBuilder(200);
-        sb.append("<?xml version='1.0' encoding='UTF-8'?>");
-        sb.append("<stream:stream ");
-        sb
-                .append("xmlns:stream=\"http://etherx.jabber.org/streams\" xmlns=\"jabber:client\" from=\"");
-        sb.append(serverName);
-        sb.append("\" id=\"");
-        sb.append(session.getStreamID().toString());
-        sb.append("\" xml:lang=\"");
-        sb.append(language);
-        sb.append("\" version=\"");
-        sb.append(MAJOR_VERSION).append(".").append(MINOR_VERSION);
-        sb.append("\">");
-        connection.deliverRawText(sb.toString());
+		// 建立开始数据包响应
+		StringBuilder sb = new StringBuilder(200);
+		sb.append("<?xml version='1.0' encoding='UTF-8'?>");
+		sb.append("<stream:stream ");
+		sb.append("xmlns:stream=\"http://etherx.jabber.org/streams\" xmlns=\"jabber:client\" from=\"");
+		sb.append(serverName);
+		sb.append("\" id=\"");
+		sb.append(session.getStreamID().toString());
+		sb.append("\" xml:lang=\"");
+		sb.append(language);
+		sb.append("\" version=\"");
+		sb.append(MAJOR_VERSION).append(".").append(MINOR_VERSION);
+		sb.append("\">");
+		connection.deliverRawText(sb.toString());
 
-        // XMPP 1.0 needs stream features
-        sb = new StringBuilder();
-        sb.append("<stream:features>");
-        if (connection.getTlsPolicy() != Connection.TLSPolicy.disabled) {
-            sb.append("<starttls xmlns=\"urn:ietf:params:xml:ns:xmpp-tls\">");
-            if (connection.getTlsPolicy() == Connection.TLSPolicy.required) {
-                sb.append("<required/>");
-            }
-            sb.append("</starttls>");
-        }
+		// XMPP 1.0 需要 stream features
+		sb = new StringBuilder();
+		sb.append("<stream:features>");
+		if (connection.getTlsPolicy() != Connection.TLSPolicy.disabled) {
+			sb.append("<starttls xmlns=\"urn:ietf:params:xml:ns:xmpp-tls\">");
+			if (connection.getTlsPolicy() == Connection.TLSPolicy.required) {
+				sb.append("<required/>");
+			}
+			sb.append("</starttls>");
+		}
 
-        String specificFeatures = session.getAvailableStreamFeatures();
-        if (specificFeatures != null) {
-            sb.append(specificFeatures);
-        }
-        sb.append("</stream:features>");
+		// 具体功能
+		String specificFeatures = session.getAvailableStreamFeatures();
+		if (specificFeatures != null) {
+			sb.append(specificFeatures);
+		}
+		sb.append("</stream:features>");
 
-        connection.deliverRawText(sb.toString());
-        return session;
-    }
+		connection.deliverRawText(sb.toString());
+		return session;
+	}
 
-    /**
-     * Returns the username associated with this session.
-     * 
-     * @return the username
-     * @throws UserNotFoundException if a user has not authenticated yet
-     */
-    public String getUsername() throws UserNotFoundException {
-        if (authToken == null) {
-            throw new UserNotFoundException();
-        }
-        return getAddress().getNode();
-    }
+	/**
+	 * 返回与此会话相关联的用户名
+	 * 
+	 * @return
+	 * @throws UserNotFoundException
+	 *             如果用户还没有身份认证
+	 */
+	public String getUsername() throws UserNotFoundException {
+		if (authToken == null) {
+			throw new UserNotFoundException();
+		}
+		return getAddress().getNode();
+	}
 
-    /**
-     * Returns the authentication token associated with this session.
-     * 
-     * @return the authentication token
-     */
-    public AuthToken getAuthToken() {
-        return authToken;
-    }
+	/**
+	 * 返回与此会话相关联的身份认证令牌
+	 * 
+	 * @return 认证令牌
+	 */
+	public AuthToken getAuthToken() {
+		return authToken;
+	}
 
-    /**
-     * Initialize the session with an authentication token
-     * @param authToken the authentication token
-     */
-    public void setAuthToken(AuthToken authToken) {
-        this.authToken = authToken;
-    }
+	/**
+	 * 用认证令牌初始化会话
+	 * 
+	 * @param authToken
+	 *            认证令牌
+	 */
+	public void setAuthToken(AuthToken authToken) {
+		this.authToken = authToken;
+	}
 
-    /**
-     * Initialize the session with an authentication token and resource name.
-     * 
-     * @param authToken the authentication token
-     * @param resource the resource
-     */
-    public void setAuthToken(AuthToken authToken, String resource) {
-        setAddress(new JID(authToken.getUsername(), getServerName(), resource));
-        this.authToken = authToken;
-        setStatus(Session.STATUS_AUTHENTICATED);
-        // Add session to the session manager
-        sessionManager.addSession(this);
-    }
+	/**
+	 * 用认证令牌和资源名称初始化会话
+	 * 
+	 * @param authToken
+	 *            认证令牌
+	 * @param resource
+	 *            资源名
+	 */
+	public void setAuthToken(AuthToken authToken, String resource) {
+		setAddress(new JID(authToken.getUsername(), getServerName(), resource));
+		this.authToken = authToken;
+		setStatus(Session.STATUS_AUTHENTICATED);
+		// 添加会话到会话管理器
+		sessionManager.addSession(this);
+	}
 
-    /**
-     * Indicates if the session has been initialized.
-     * 
-     * @return true if the session has been initialized, false otherwise.
-     */
-    public boolean isInitialized() {
-        return initialized;
-    }
+	/**
+	 * 指示会话是否已初始化
+	 * 
+	 * @return true：会话已初始化, false：还未初始化
+	 */
+	public boolean isInitialized() {
+		return initialized;
+	}
 
-    /**
-     * Sets the initialization state of the session.
-     * 
-     * @param initialized true if the session has been initialized
-     */
-    public void setInitialized(boolean initialized) {
-        this.initialized = initialized;
-    }
+	/**
+	 * 设置会话的初始化状态
+	 * 
+	 * @param initialized
+	 *            true：会话已初始化
+	 */
+	public void setInitialized(boolean initialized) {
+		this.initialized = initialized;
+	}
 
-    /**
-     * Indicates if the session was available ever.
-     *  
-     * @return true if the session was available ever, false otherwise.
-     */
-    public boolean wasAvailable() {
-        return wasAvailable;
-    }
+	/**
+	 * 指示是否有可用的会话。
+	 * 
+	 * @return true：有, false：无.
+	 */
+	public boolean wasAvailable() {
+		return wasAvailable;
+	}
 
-    /**
-     * Returns the presence of this session.
-     *  
-     * @return the presence
-     */
-    public Presence getPresence() {
-        return presence;
-    }
+	/**
+	 * 返回此会话的presence
+	 * 
+	 * @return
+	 */
+	public Presence getPresence() {
+		return presence;
+	}
 
-    /**
-     * Sets the presence of this session.
-     * 
-     * @param presence the presence
-     */
-    public void setPresence(Presence presence) {
-        Presence oldPresence = this.presence;
-        this.presence = presence;
-        if (oldPresence.isAvailable() && !this.presence.isAvailable()) {
-            setInitialized(false);
-        } else if (!oldPresence.isAvailable() && this.presence.isAvailable()) {
-            wasAvailable = true;
-        }
-    }
+	/**
+	 * 设置此会话的presence
+	 * 
+	 * @param presence
+	 */
+	public void setPresence(Presence presence) {
+		Presence oldPresence = this.presence;
+		this.presence = presence;
+		if (oldPresence.isAvailable() && !this.presence.isAvailable()) {
+			setInitialized(false);
+		} else if (!oldPresence.isAvailable() && this.presence.isAvailable()) {
+			wasAvailable = true;
+		}
+	}
 
-    /**
-     * Returns a text with the available stream features. 
-     */
-    public String getAvailableStreamFeatures() {
-        StringBuilder sb = new StringBuilder();
-        if (getAuthToken() == null) {
-            // Supports Non-SASL Authentication            
-            sb.append("<auth xmlns=\"http://jabber.org/features/iq-auth\"/>");
-            // Supports In-Band Registration
-            sb
-                    .append("<register xmlns=\"http://jabber.org/features/iq-register\"/>");
-        } else {
-            // If the session has been authenticated            
-            sb.append("<bind xmlns=\"urn:ietf:params:xml:ns:xmpp-bind\"/>");
-            sb
-                    .append("<session xmlns=\"urn:ietf:params:xml:ns:xmpp-session\"/>");
-        }
-        return sb.toString();
-    }
+	/**
+	 * 返回一个available stream features的文本.
+	 */
+	public String getAvailableStreamFeatures() {
+		StringBuilder sb = new StringBuilder();
+		if (getAuthToken() == null) {
+			// 支持 Non-SASL 认证模式
+			sb.append("<auth xmlns=\"http://jabber.org/features/iq-auth\"/>");
+			// 支持 In-Band 注册
+			sb.append("<register xmlns=\"http://jabber.org/features/iq-register\"/>");
+		} else {
+			// 如果会话已被认证
+			sb.append("<bind xmlns=\"urn:ietf:params:xml:ns:xmpp-bind\"/>");
+			sb.append("<session xmlns=\"urn:ietf:params:xml:ns:xmpp-session\"/>");
+		}
+		return sb.toString();
+	}
 
-    @Override
-    public String toString() {
-        return super.toString() + " presence: " + presence;
-    }
+	@Override
+	public String toString() {
+		return super.toString() + " presence: " + presence;
+	}
 
 }

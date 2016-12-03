@@ -30,16 +30,36 @@ import javax.net.ssl.TrustManagerFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/** 
- * SSL Trust Manager Factory class.
- *
- * @author Sehwan Noh (sehnoh@gmail.com)
+/**
+ * SSL信任管理器工厂类
+ * 
+ * @author lijian
+ * @date 2016-12-4 上午12:47:12
  */
 public class SSLTrustManagerFactory {
 
     private static final Log log = LogFactory
             .getLog(SSLTrustManagerFactory.class);
 
+	/**
+	 * 获取Trust管理器集合
+	 * 
+	 * @param storeType
+	 *            存储类型
+	 * @param truststore
+	 *            key库
+	 * @param trustpass
+	 *            key密钥
+	 * @return
+	 * @throws NoSuchAlgorithmException
+	 *             没有这样的算法异常
+	 * @throws KeyStoreException
+	 *             密钥库异常
+	 * @throws IOException
+	 *             IO异常
+	 * @throws CertificateException
+	 *             证书异常
+	 */
     public static TrustManager[] getTrustManagers(String storeType,
             String truststore, String trustpass)
             throws NoSuchAlgorithmException, KeyStoreException, IOException,
@@ -62,6 +82,15 @@ public class SSLTrustManagerFactory {
         return trustManagers;
     }
 
+	/**
+	 * 获得Trust管理器集合
+	 * 
+	 * @param truststore
+	 *            Trust库
+	 * @param trustpass
+	 *            Trust密钥
+	 * @return
+	 */
     public static TrustManager[] getTrustManagers(KeyStore truststore,
             String trustpass) {
         TrustManager[] trustManagers;
@@ -80,12 +109,12 @@ public class SSLTrustManagerFactory {
                 trustManagers = trustFactory.getTrustManagers();
             }
         } catch (KeyStoreException e) {
-            trustManagers = null;
-            log.error("SSLTrustManagerFactory startup problem.", e);
-        } catch (NoSuchAlgorithmException e) {
-            trustManagers = null;
-            log.error("SSLTrustManagerFactory startup problem.", e);
-        }
+			trustManagers = null;
+			log.error("SSLTrustManagerFactory 启动问题.", e);
+		} catch (NoSuchAlgorithmException e) {
+			trustManagers = null;
+			log.error("SSLTrustManagerFactory 启动问题.", e);
+		}
         return trustManagers;
     }
 

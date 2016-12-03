@@ -19,10 +19,11 @@ package org.androidpn.server.util;
 
 import java.util.List;
 
-/** 
- * Utility class to obtain the values from configruation.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 工具类-从配置文件中获取参数
+ * 
+ * @author lijian
+ * @date 2016-12-3 下午11:44:28
  */
 public class Config {
 

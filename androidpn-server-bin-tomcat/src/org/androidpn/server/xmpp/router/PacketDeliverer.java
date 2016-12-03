@@ -25,37 +25,40 @@ import org.apache.commons.logging.LogFactory;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Packet;
 
-/** 
- * This class is to deliver the packets to the connected sessions. 
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 将数据包投递给连接的会话
+ * 
+ * @author lijian
+ * @date 2016-12-4 上午12:36:13
  */
 public class PacketDeliverer {
 
     private static final Log log = LogFactory.getLog(PacketDeliverer.class);
 
-    /**
-     * Delivers the packet to the packet recipient.  
-     * 
-     * @param packet the packet to deliver
-     * @throws PacketException if the packet is null or the recipient was not found.
-     */
-    public static void deliver(Packet packet) throws PacketException {
-        if (packet == null) {
-            throw new PacketException("Packet was null");
-        }
+	/**
+	 * 将数据包传递给数据包收件人
+	 * 
+	 * @param packet
+	 *            要被投递的数据包
+	 * @throws PacketException
+	 *             如果数据包为空，或收件人未找到
+	 */
+	public static void deliver(Packet packet) throws PacketException {
+		if (packet == null) {
+			throw new PacketException("数据包为null");
+		}
 
-        try {
-            JID recipient = packet.getTo();
-            if (recipient != null) {
-                ClientSession clientSession = SessionManager.getInstance()
-                        .getSession(recipient);
-                if (clientSession != null) {
-                    clientSession.deliver(packet);
-                }
-            }
-        } catch (Exception e) {
-            log.error("Could not deliver packet: " + packet.toString(), e);
-        }
-    }
+		try {
+			JID recipient = packet.getTo();
+			if (recipient != null) {
+				ClientSession clientSession = SessionManager.getInstance()
+						.getSession(recipient);
+				if (clientSession != null) {
+					clientSession.deliver(packet);
+				}
+			}
+		} catch (Exception e) {
+			log.error("不能提供数据包: " + packet.toString(), e);
+		}
+	}
 }

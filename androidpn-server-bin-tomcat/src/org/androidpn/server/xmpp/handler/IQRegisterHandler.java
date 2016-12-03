@@ -35,22 +35,25 @@ import org.xmpp.packet.IQ;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.PacketError;
 
-/** 
- * This class is to handle the TYPE_IQ jabber:iq:register protocol.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 本类处理TYPE_IQ类型为jabber:iq:register的协议(注册)
+ * 
+ * @author lijian
+ * @date 2016-12-4 上午12:08:28
  */
 public class IQRegisterHandler extends IQHandler {
 
     private static final String NAMESPACE = "jabber:iq:register";
 
-    private UserService userService;
+	/** 用户管理业务服务接口 */
+	private UserService userService;
 
-    private Element probeResponse;
+	/** 探头应答 */
+	private Element probeResponse;
 
-    /**
-     * Constructor.
-     */
+	/**
+	 * 本类处理TYPE_IQ类型为jabber:iq:register的协议.
+	 */
     public IQRegisterHandler() {
         userService = ServiceLocator.getUserService();
         probeResponse = DocumentHelper.createElement(QName.get("query",
@@ -61,26 +64,20 @@ public class IQRegisterHandler extends IQHandler {
         probeResponse.addElement("name");
     }
 
-    /**
-     * Handles the received IQ packet.
-     * 
-     * @param packet the packet
-     * @return the response to send back
-     * @throws UnauthorizedException if the user is not authorized
-     */
+    @Override
     public IQ handleIQ(IQ packet) throws UnauthorizedException {
         IQ reply = null;
 
         ClientSession session = sessionManager.getSession(packet.getFrom());
         if (session == null) {
-            log.error("Session not found for key " + packet.getFrom());
+			log.error("未找到Key的Session " + packet.getFrom());
             reply = IQ.createResultIQ(packet);
             reply.setChildElement(packet.getChildElement().createCopy());
             reply.setError(PacketError.Condition.internal_server_error);
             return reply;
         }
 
-        if (IQ.Type.get.equals(packet.getType())) {
+        if (IQ.Type.get.equals(packet.getType())) { // 得到查询
             reply = IQ.createResultIQ(packet);
             if (session.getStatus() == Session.STATUS_AUTHENTICATED) {
                 // TODO
@@ -88,7 +85,7 @@ public class IQRegisterHandler extends IQHandler {
                 reply.setTo((JID) null);
                 reply.setChildElement(probeResponse.createCopy());
             }
-        } else if (IQ.Type.set.equals(packet.getType())) {
+        } else if (IQ.Type.set.equals(packet.getType())) {// 设置查询
             try {
                 Element query = packet.getChildElement();
                 if (query.element("remove") != null) {
@@ -103,12 +100,12 @@ public class IQRegisterHandler extends IQHandler {
                     String email = query.elementText("email");
                     String name = query.elementText("name");
 
-                    // Verify the username
+					// 验证这个 username
                     if (username != null) {
                         Stringprep.nodeprep(username);
                     }
 
-                    // Deny registration of users with no password
+					// 拒绝没有密码的用户注册
                     if (password == null || password.trim().length() == 0) {
                         reply = IQ.createResultIQ(packet);
                         reply.setChildElement(packet.getChildElement()
@@ -157,18 +154,14 @@ public class IQRegisterHandler extends IQHandler {
             }
         }
 
-        // Send the response directly to the session
+		// 立即发送应答到会话
         if (reply != null) {
             session.process(reply);
         }
         return null;
     }
 
-    /**
-     * Returns the namespace of the handler.
-     * 
-     * @return the namespace
-     */
+    @Override
     public String getNamespace() {
         return NAMESPACE;
     }

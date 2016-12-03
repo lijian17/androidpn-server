@@ -17,10 +17,11 @@
  */
 package org.androidpn.server.xmpp;
 
-/** 
- * Runtime exceptions produced by failed packet operations.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 运行时异常-由失败的数据包操作
+ * 
+ * @author lijian
+ * @date 2016-12-3 下午11:47:22
  */
 public class PacketException extends RuntimeException {
     

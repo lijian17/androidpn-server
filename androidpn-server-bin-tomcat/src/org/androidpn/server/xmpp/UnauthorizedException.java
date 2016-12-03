@@ -17,10 +17,11 @@
  */
 package org.androidpn.server.xmpp;
 
-/** 
- * Thrown if a user was not authorized to do a particular operation.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 如果一个用户没有被授权做某个特定的操作，将抛异常
+ * 
+ * @author lijian
+ * @date 2016-12-3 下午11:48:00
  */
 public class UnauthorizedException extends Exception {
     

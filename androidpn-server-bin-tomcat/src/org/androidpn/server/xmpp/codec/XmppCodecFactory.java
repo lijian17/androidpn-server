@@ -22,37 +22,37 @@ import org.apache.mina.filter.codec.ProtocolCodecFactory;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 
-/** 
- * Factory class that specifies the encode and decoder to use for parsing XMPP stanzas.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 工厂-XMPP编解码器
+ * 
+ * @author lijian
+ * @date 2016-12-4 上午12:01:30
  */
 public class XmppCodecFactory implements ProtocolCodecFactory {
 
-    private final XmppEncoder encoder;
+	/** 编码器 */
+	private final XmppEncoder encoder;
 
-    private final XmppDecoder decoder;
+	/** 解码器 */
+	private final XmppDecoder decoder;
 
-    /**
-     * Constructor.
-     */
-    public XmppCodecFactory() {
-        encoder = new XmppEncoder();
-        decoder = new XmppDecoder();
-    }
+	public XmppCodecFactory() {
+		encoder = new XmppEncoder();
+		decoder = new XmppDecoder();
+	}
 
-    /**
-     * Returns a new (or reusable) instance of ProtocolEncoder.
-     */
-    public ProtocolEncoder getEncoder(IoSession session) throws Exception {
-        return encoder;
-    }
+	/**
+	 * 返回一个新的（或可重复使用的）ProtocolEncoder实例
+	 */
+	public ProtocolEncoder getEncoder(IoSession session) throws Exception {
+		return encoder;
+	}
 
-    /**
-     * Returns a new (or reusable) instance of ProtocolDecoder.
-     */
-    public ProtocolDecoder getDecoder(IoSession session) throws Exception {
-        return decoder;
-    }
+	/**
+	 * 返回一个新的（或可重复使用的）ProtocolDecoder实例
+	 */
+	public ProtocolDecoder getDecoder(IoSession session) throws Exception {
+		return decoder;
+	}
 
 }

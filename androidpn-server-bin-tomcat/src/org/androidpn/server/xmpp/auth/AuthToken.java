@@ -19,22 +19,25 @@ package org.androidpn.server.xmpp.auth;
 
 import org.androidpn.server.util.Config;
 
-/** 
- * This class represents a token that proves a user's authentication.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 令牌-代表一个验证用户名真实性的证明
+ * 
+ * @author lijian
+ * @date 2016-12-4 上午12:00:08
  */
 public class AuthToken {
 
+	/** 用户名 */
     private String username;
 
+	/** 域 */
     private String domain;
 
-    /**
-     * Constucts a new AuthToken with the specified JID.
-     * 
-     * @param jid the username or bare JID
-     */
+	/**
+	 * 根据JID创建一个令牌
+	 * 
+	 * @param jid
+	 */
     public AuthToken(String jid) {
         if (jid == null) {
             this.domain = Config.getString("xmpp.domain");
@@ -50,20 +53,20 @@ public class AuthToken {
         }
     }
 
-    /**
-     * Returns the username.
-     * 
-     * @return the username
-     */
+	/**
+	 * 获得用户名（不包含@和域的用户名）
+	 * 
+	 * @return
+	 */
     public String getUsername() {
         return username;
     }
 
-    /**
-     * Returns the domain.
-     * 
-     * @return the domain
-     */
+	/**
+	 * 获得domain
+	 * 
+	 * @return
+	 */
     public String getDomain() {
         return domain;
     }

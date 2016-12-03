@@ -28,29 +28,31 @@ import org.xmpp.packet.Packet;
 import org.xmpp.packet.PacketError;
 import org.xmpp.packet.Presence;
 
-/** 
- * This class is to handle the presence protocol.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 这个类处理出席协议
+ * 
+ * @author lijian
+ * @date 2016-12-4 上午12:11:28
  */
 public class PresenceUpdateHandler {
 
     protected final Log log = LogFactory.getLog(getClass());
 
+	/** 连接到服务器的会话管理器 */
     protected SessionManager sessionManager;
 
     /**
-     * Constructor.
+     * 这个类处理出席协议.
      */
     public PresenceUpdateHandler() {
         sessionManager = SessionManager.getInstance();
     }
 
-    /**
-     * Processes the presence packet.
-     * 
-     * @param packet the packet
-     */
+	/**
+	 * 处理出席数据包
+	 * 
+	 * @param packet
+	 */
     public void process(Packet packet) {
         ClientSession session = sessionManager.getSession(packet.getFrom());
 
@@ -74,7 +76,7 @@ public class PresenceUpdateHandler {
                     }
                 }
 
-            } else if (Presence.Type.unavailable == type) {
+            } else if (Presence.Type.unavailable == type) {// 不可用的
 
                 if (session != null) {
                     session.setPresence(presence);
@@ -96,8 +98,7 @@ public class PresenceUpdateHandler {
             }
 
         } catch (Exception e) {
-            log.error("Internal server error. Triggered by packet: " + packet,
-                    e);
+			log.error("内部服务器错误. Triggered by packet: " + packet, e);
         }
     }
 

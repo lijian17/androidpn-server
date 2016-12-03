@@ -33,20 +33,22 @@ import org.xmpp.packet.IQ;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.PacketError;
 
-/** 
- * This class is to handle the TYPE_IQ jabber:iq:auth protocol.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 本类处理TYPE_IQ类型为jabber:iq:auth的协议(认证)
+ * 
+ * @author lijian
+ * @date 2016-12-4 上午12:03:38
  */
 public class IQAuthHandler extends IQHandler {
 
     private static final String NAMESPACE = "jabber:iq:auth";
 
+	/** 探头应答 */
     private Element probeResponse;
 
-    /**
-     * Constructor.
-     */
+	/**
+	 * 本类处理TYPE_IQ类型为jabber:iq:auth的协议.
+	 */
     public IQAuthHandler() {
         probeResponse = DocumentHelper.createElement(QName.get("query",
                 NAMESPACE));
@@ -60,19 +62,13 @@ public class IQAuthHandler extends IQHandler {
         probeResponse.addElement("resource");
     }
 
-    /**
-     * Handles the received IQ packet.
-     * 
-     * @param packet the packet
-     * @return the response to send back
-     * @throws UnauthorizedException if the user is not authorized
-     */
+    @Override
     public IQ handleIQ(IQ packet) throws UnauthorizedException {
         IQ reply = null;
 
         ClientSession session = sessionManager.getSession(packet.getFrom());
         if (session == null) {
-            log.error("Session not found for key " + packet.getFrom());
+			log.error("未找到key的会话 " + packet.getFrom());
             reply = IQ.createResultIQ(packet);
             reply.setChildElement(packet.getChildElement().createCopy());
             reply.setError(PacketError.Condition.internal_server_error);
@@ -84,7 +80,7 @@ public class IQAuthHandler extends IQHandler {
             Element query = iq.element("query");
             Element queryResponse = probeResponse.createCopy();
 
-            if (IQ.Type.get == packet.getType()) { // get query
+            if (IQ.Type.get == packet.getType()) { // 得到查询
                 String username = query.elementText("username");
                 if (username != null) {
                     queryResponse.element("username").setText(username);
@@ -94,42 +90,42 @@ public class IQAuthHandler extends IQHandler {
                 if (session.getStatus() != Session.STATUS_AUTHENTICATED) {
                     reply.setTo((JID) null);
                 }
-            } else { // set query
+            } else { // 设置查询
                 String resource = query.elementText("resource");
                 String username = query.elementText("username");
                 String password = query.elementText("password");
                 String digest = null;
-                if (query.element("digest") != null) {
+                if (query.element("digest") != null) {// 摘要
                     digest = query.elementText("digest").toLowerCase();
                 }
 
-                // Verify the resource
+                // 验证这个resource
                 if (resource != null) {
                     try {
                         resource = JID.resourceprep(resource);
                     } catch (StringprepException e) {
-                        throw new UnauthorizedException("Invalid resource: "
-                                + resource, e);
+						throw new UnauthorizedException("无效resource: "
+								+ resource, e);
                     }
                 } else {
                     throw new IllegalArgumentException(
-                            "Invalid resource (empty or null).");
+							"无效resource (empty or null).");
                 }
 
-                // Verify the username
+				// 验证这个username
                 if (username == null || username.trim().length() == 0) {
-                    throw new UnauthorizedException(
-                            "Invalid username (empty or null).");
+					throw new UnauthorizedException(
+							"无效 username (empty or null).");
                 }
                 try {
                     Stringprep.nodeprep(username);
                 } catch (StringprepException e) {
-                    throw new UnauthorizedException("Invalid username: "
-                            + username, e);
+					throw new UnauthorizedException("无效 username: " + username,
+							e);
                 }
                 username = username.toLowerCase();
 
-                // Verify that username and password are correct
+				// 验证username and password是否正确
                 AuthToken token = null;
                 if (password != null && AuthManager.isPlainSupported()) {
                     token = AuthManager.authenticate(username, password);
@@ -142,7 +138,7 @@ public class IQAuthHandler extends IQHandler {
                     throw new UnauthenticatedException();
                 }
 
-                // Set the session authenticated successfully
+				// 设置会话认证成功
                 session.setAuthToken(token, resource);
                 packet.setFrom(session.getAddress());
                 reply = IQ.createResultIQ(packet);
@@ -162,18 +158,14 @@ public class IQAuthHandler extends IQHandler {
             }
         }
 
-        // Send the response directly to the session
+		// 立即发送应答到会话
         if (reply != null) {
             session.process(reply);
         }
         return null;
     }
 
-    /**
-     * Returns the namespace of the handler.
-     * 
-     * @return the namespace
-     */
+    @Override
     public String getNamespace() {
         return NAMESPACE;
     }

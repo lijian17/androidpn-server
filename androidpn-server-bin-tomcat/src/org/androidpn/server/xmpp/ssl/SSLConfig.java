@@ -31,32 +31,39 @@ import org.androidpn.server.util.Config;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.sun.org.apache.bcel.internal.util.ClassPath;
-
-/** 
- * Configuration class for SSL settings.
- *
- * @author Sehwan Noh (sehnoh@gmail.com)
+/**
+ * SSL配置类
+ * 
+ * @author lijian
+ * @date 2016-12-4 上午12:42:11
  */
 public class SSLConfig {
 
     private static final Log log = LogFactory.getLog(SSLConfig.class);
 
-    private static SSLContext sslContext;
+	/** SSL上下文 */
+	private static SSLContext sslContext;
 
-    private static String storeType;
+	/** 存储类型 */
+	private static String storeType;
 
-    private static KeyStore keyStore;
+	/** 存储key */
+	private static KeyStore keyStore;
 
-    private static String keyStoreLocation;
+	/** 存储key位置 */
+	private static String keyStoreLocation;
 
-    private static String keyPass;
+	/** key密码 */
+	private static String keyPass;
 
-    private static KeyStore trustStore;
+	/** 信任存储区 */
+	private static KeyStore trustStore;
 
-    private static String trustStoreLocation;
+	/** 信任存储区位置 */
+	private static String trustStoreLocation;
 
-    private static String trustPass;
+	/** 信任存储区密钥 */
+	private static String trustPass;
     
     private static URL classPath;
 
@@ -64,6 +71,7 @@ public class SSLConfig {
     }
 
     static {
+		// 加载配置文件信息（见：config.properties）
         storeType = Config.getString("xmpp.ssl.storeType", "JKS");
         keyStoreLocation = Config.getString("xmpp.ssl.keystore", "conf"
                 + File.separator + "security" + File.separator + "keystore");
@@ -87,15 +95,13 @@ public class SSLConfig {
             keyStore.load(new FileInputStream(keyStoreLocation), keyPass
                     .toCharArray());
         } catch (Exception e) {
-            log.error(
-                    "SSLConfig startup problem.\n" + "  storeType: ["
-                            + storeType + "]\n" + "  keyStoreLocation: ["
-                            + keyStoreLocation + "]\n" + "  keyPass: ["
-                            + keyPass + "]", e);
+			log.error("SSLConfig 启动发生错误.\n" + "  storeType: [" + storeType
+					+ "]\n" + "  keyStoreLocation: [" + keyStoreLocation
+					+ "]\n" + "  keyPass: [" + keyPass + "]", e);
             keyStore = null;
         }
 
-        // Load truststore
+		// 加载信任库 truststore
         try {
             trustStore = KeyStore.getInstance(storeType);
             trustStore.load(new FileInputStream(trustStoreLocation), trustPass
@@ -106,15 +112,15 @@ public class SSLConfig {
                 trustStore = KeyStore.getInstance(storeType);
                 trustStore.load(null, trustPass.toCharArray());
             } catch (Exception ex) {
-                log.error("SSLConfig startup problem.\n" + "  storeType: ["
-                        + storeType + "]\n" + "  trustStoreLocation: ["
-                        + trustStoreLocation + "]\n" + "  trustPass: ["
-                        + trustPass + "]", e);
+				log.error("SSLConfig 启动发生错误.\n" + "  storeType: [" + storeType
+						+ "]\n" + "  trustStoreLocation: ["
+						+ trustStoreLocation + "]\n" + "  trustPass: ["
+						+ trustPass + "]", e);
                 trustStore = null;
             }
         }
 
-        // Init factory        
+		// 初始化工厂      
         try {
             sslContext = SSLContext.getInstance("TLS");
 
@@ -130,57 +136,57 @@ public class SSLConfig {
                     .getTrustManagers(), new java.security.SecureRandom());
 
         } catch (Exception e) {
-            log.error("SSLConfig factory setup problem." + "  storeType: ["
-                    + storeType + "]\n" + "  keyStoreLocation: ["
-                    + keyStoreLocation + "]\n" + "  keyPass: [" + keyPass
-                    + "]\n" + "  trustStoreLocation: [" + trustStoreLocation
-                    + "]\n" + "  trustPass: [" + trustPass + "]", e);
+			log.error("SSLConfig 工厂启动发生错误." + "  storeType: [" + storeType
+					+ "]\n" + "  keyStoreLocation: [" + keyStoreLocation
+					+ "]\n" + "  keyPass: [" + keyPass + "]\n"
+					+ "  trustStoreLocation: [" + trustStoreLocation + "]\n"
+					+ "  trustPass: [" + trustPass + "]", e);
             keyStore = null;
             trustStore = null;
         }
     }
 
-    /**
-     * Get the SSLContext.
-     *
-     * @return the SSLContext
-     */
+	/**
+	 * 获得SSLContext.
+	 * 
+	 * @return SSL上下文
+	 */
     public static SSLContext getc2sSSLContext() {
         return sslContext;
     }
 
-    /**
-     * Get the Key Store location.
-     *
-     * @return the keystore location
-     */
+	/**
+	 * 获取密钥存储位置
+	 * 
+	 * @return 密钥库的位置
+	 */
     public static String getKeystoreLocation() {
         return keyStoreLocation;
     }
 
-    /**
-     * Get the Trust Store location.
-     *
-     * @return the Trust Store location
-     */
+	/**
+	 * 获得信任的存储位置
+	 * 
+	 * @return 信任存储位置
+	 */
     public static String getc2sTruststoreLocation() {
         return trustStoreLocation;
     }
 
-    /**
-     * Get the Store Type.
-     * 
-     * @return the Store Type
-     */
+	/**
+	 * 获取存储类型
+	 * 
+	 * @return
+	 */
     public static String getStoreType() {
         return storeType;
     }
 
-    /**
-     * Get the Key Store.
-     *
-     * @return the Key Store
-     */
+	/**
+	 * 获取密钥存储区
+	 * 
+	 * @return
+	 */
     public static KeyStore getKeyStore() throws IOException {
         if (keyStore == null) {
             throw new IOException();
@@ -188,20 +194,20 @@ public class SSLConfig {
         return keyStore;
     }
 
-    /**
-     * Get the Key Store password.
-     *
-     * @return the key store password
-     */
+	/**
+	 * 获取密钥存储密码
+	 * 
+	 * @return
+	 */
     public static String getKeyPassword() {
         return keyPass;
     }
 
-    /** 
-     * Get the Trust Store.
-     *
-     * @return the trust store
-     */
+	/**
+	 * 获得信任存储
+	 * 
+	 * @return
+	 */
     public static KeyStore getc2sTrustStore() throws IOException {
         if (trustStore == null) {
             throw new IOException();
@@ -209,11 +215,11 @@ public class SSLConfig {
         return trustStore;
     }
 
-    /**
-     * Return the Trust Store password.
-     *
-     * @return the trust store password
-     */
+	/**
+	 * 返回信任存储密码
+	 * 
+	 * @return
+	 */
     public static String getc2sTrustPassword() {
         return trustPass;
     }

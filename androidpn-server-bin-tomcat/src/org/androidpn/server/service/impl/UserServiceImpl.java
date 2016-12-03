@@ -31,10 +31,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 
-/** 
- * This class is the implementation of UserService.
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * UserService的实现类
+ * 
+ * @author lijian
+ * @date 2016-12-3 下午11:42:28
  */
 public class UserServiceImpl implements UserService {
 
@@ -59,20 +60,22 @@ public class UserServiceImpl implements UserService {
     }
 
     public User saveUser(User user) throws UserExistsException {
-        try {
-            return userDao.saveUser(user);
-        } catch (DataIntegrityViolationException e) {
-            e.printStackTrace();
-            log.warn(e.getMessage());
-            throw new UserExistsException("User '" + user.getUsername()
-                    + "' already exists!");
-        } catch (EntityExistsException e) { // needed for JPA
-            e.printStackTrace();
-            log.warn(e.getMessage());
-            throw new UserExistsException("User '" + user.getUsername()
-                    + "' already exists!");
-        }
-    }
+		try {
+			return userDao.saveUser(user);
+		} catch (DataIntegrityViolationException e) {
+			e.printStackTrace();
+			log.warn(e.getMessage());
+			throw new UserExistsException("用户 '" + user.getUsername()
+					+ "' 已经存在!");
+		} catch (EntityExistsException e) { // 需要JPA
+			// JPA全称Java Persistence API.
+			// JPA通过JDK5.0注解或XML描述对象－关系表的映射关系，并将运行期的实体对象持久化到数据库中。
+			e.printStackTrace();
+			log.warn(e.getMessage());
+			throw new UserExistsException("User '" + user.getUsername()
+					+ "' 需要JPA!");
+		}
+	}
 
     public User getUserByUsername(String username) throws UserNotFoundException {
         return (User) userDao.getUserByUsername(username);

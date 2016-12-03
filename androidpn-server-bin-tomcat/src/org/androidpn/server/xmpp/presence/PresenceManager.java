@@ -22,48 +22,49 @@ import org.androidpn.server.xmpp.session.ClientSession;
 import org.androidpn.server.xmpp.session.SessionManager;
 import org.xmpp.packet.Presence;
 
-/** 
- * This class is to manage the presences of users. 
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * 用户出席信息管理类
+ * 
+ * @author lijian
+ * @date 2016-12-4 上午12:31:36
  */
 public class PresenceManager {
 
     private SessionManager sessionManager;
 
-    /**
-     * Constructor.
-     */
-    public PresenceManager() {
-        sessionManager = SessionManager.getInstance();
-    }
+	/**
+	 * 用户出席信息管理类
+	 */
+	public PresenceManager() {
+		sessionManager = SessionManager.getInstance();
+	}
 
-    /**
-     * Returns the availability of the user.
-     * 
-     * @param user the user
-     * @return true if the user is available
-     */
-    public boolean isAvailable(User user) {
-        return sessionManager.getSession(user.getUsername()) != null;
-    }
+	/**
+	 * 获取用户是否可用的
+	 * 
+	 * @param user
+	 * @return true：用户是可用的
+	 */
+	public boolean isAvailable(User user) {
+		return sessionManager.getSession(user.getUsername()) != null;
+	}
 
-    /**
-     * Returns the current presence of the user.
-     * 
-     * @param user the user
-     * @return the current presence of the user.
-     */
-    public Presence getPresence(User user) {
-        if (user == null) {
-            return null;
-        }
-        Presence presence = null;
-        ClientSession session = sessionManager.getSession(user.getUsername());
-        if (session != null) {
-            presence = session.getPresence();
-        }
-        return presence;
-    }
+	/**
+	 * 获得用户当前出席状态
+	 * 
+	 * @param user
+	 * @return
+	 */
+	public Presence getPresence(User user) {
+		if (user == null) {
+			return null;
+		}
+		Presence presence = null;
+		ClientSession session = sessionManager.getSession(user.getUsername());
+		if (session != null) {
+			presence = session.getPresence();
+		}
+		return presence;
+	}
 
 }

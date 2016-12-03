@@ -26,9 +26,10 @@ import org.androidpn.server.service.UserNotFoundException;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
- * This class is the implementation of UserDAO using Spring's HibernateTemplate.
+ * 使用Spring的HibernateTemplate实现UserDAO。
  * 
- * @author Sehwan Noh (devnoh@gmail.com)
+ * @author lijian
+ * @date 2016-12-3 下午11:36:08
  */
 public class UserDaoHibernate extends HibernateDaoSupport implements UserDao {
 
@@ -69,7 +70,7 @@ public class UserDaoHibernate extends HibernateDaoSupport implements UserDao {
 		List users = getHibernateTemplate().find("from User where username=?",
 				username);
 		if (users == null || users.isEmpty()) {
-			throw new UserNotFoundException("User '" + username + "' not found");
+			throw new UserNotFoundException("用户 '" + username + "' 未找到");
 		} else {
 			return (User) users.get(0);
 		}

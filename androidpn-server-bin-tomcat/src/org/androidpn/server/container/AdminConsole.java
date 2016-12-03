@@ -31,134 +31,139 @@ import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.webapp.WebAppContext;
 
-*//** 
- * This class starts a instance on the configured port and loads the admin
- * console web application. 
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+*//**
+ * 在配置的端口上启动一个实例，并加载admin控制台Web application
+ * 
+ * @author lijian
+ * @date 2016-12-3 下午11:32:07
  *//*
 public class AdminConsole {
 
-    private static final Log log = LogFactory.getLog(AdminConsole.class);
+	private static final Log log = LogFactory.getLog(AdminConsole.class);
 
-    private String adminHost;
+	*//** admin主机 *//*
+	private String adminHost;
 
-    private int adminPort;
+	*//** admin端口 *//*
+	private int adminPort;
 
-    private Server adminServer;
+	*//** admin服务 *//*
+	private Server adminServer;
 
-    private ContextHandlerCollection contexts;
+	*//** 上下文处理控制器 *//*
+	private ContextHandlerCollection contexts;
 
-    private boolean httpStarted = false;
+	private boolean httpStarted = false;
 
-    *//**
-     * Constuctor that create a Jetty module.
-     * 
-     * @param homeDir the application home directory
-     *//*
-    public AdminConsole(String homeDir) {
-        contexts = new ContextHandlerCollection();
-        Context context = new WebAppContext(contexts, homeDir + File.separator
-                + "console", "/");
-        context.setWelcomeFiles(new String[] { "index.jsp" });
+	*//**
+	 * 创建一个Jetty模块
+	 * 
+	 * @param homeDir
+	 *            application主目录
+	 *//*
+	public AdminConsole(String homeDir) {
+		contexts = new ContextHandlerCollection();
+		Context context = new WebAppContext(contexts, homeDir + File.separator
+				+ "console", "/");
+		context.setWelcomeFiles(new String[] { "index.jsp" });
 
-        adminHost = Config.getString("admin.console.host", "127.0.0.1");
-        adminPort = Config.getInt("admin.console.port", 8080);
-        adminServer = new Server();
-        adminServer.setSendServerVersion(false);
-    }
+		adminHost = Config.getString("admin.console.host", "127.0.0.1");
+		adminPort = Config.getInt("admin.console.port", 8080);
+		adminServer = new Server();
+		adminServer.setSendServerVersion(false);
+	}
 
-    *//**
-     * Starts the Jetty server instance.
-     *//*
-    public void startup() {
-        if (adminPort > 0) {
-            Connector httpConnector = new SelectChannelConnector();
-            httpConnector.setHost(adminHost);
-            httpConnector.setPort(adminPort);
-            adminServer.addConnector(httpConnector);
-        }
+	*//**
+	 * 启动Jetty服务器实例
+	 *//*
+	public void startup() {
+		if (adminPort > 0) {
+			Connector httpConnector = new SelectChannelConnector();
+			httpConnector.setHost(adminHost);
+			httpConnector.setPort(adminPort);
+			adminServer.addConnector(httpConnector);
+		}
 
-        if (adminServer.getConnectors() == null
-                || adminServer.getConnectors().length == 0) {
-            adminServer = null;
-            log.warn("Admin console not started due to configuration error.");
-            return;
-        }
+		if (adminServer.getConnectors() == null
+				|| adminServer.getConnectors().length == 0) {
+			adminServer = null;
+			log.warn("由于配置错误，服务启动Admin console.");
+			return;
+		}
 
-        adminServer
-                .setHandlers(new Handler[] { contexts, new DefaultHandler() });
+		adminServer
+				.setHandlers(new Handler[] { contexts, new DefaultHandler() });
 
-        try {
-            adminServer.start();
-            httpStarted = true;
-            log.debug("Admin console started.");
-        } catch (Exception e) {
-            log.error("Could not start admin conosle server", e);
-        }
-    }
+		try {
+			adminServer.start();
+			httpStarted = true;
+			log.debug("Admin console 启动成功.");
+		} catch (Exception e) {
+			log.error("服务启动admin conosle 服务 ", e);
+		}
+	}
 
-    *//**
-     * Shuts down the Jetty server instance.
-     *//*
-    public void shutdown() {
-        try {
-            if (adminServer != null && adminServer.isRunning()) {
-                adminServer.stop();
-            }
-        } catch (Exception e) {
-            log.error("Error stopping admin console server", e);
-        }
-        adminServer = null;
-    }
+	*//**
+	 * 关闭Jetty服务
+	 *//*
+	public void shutdown() {
+		try {
+			if (adminServer != null && adminServer.isRunning()) {
+				adminServer.stop();
+			}
+		} catch (Exception e) {
+			log.error("关闭admin console server 的时候发生错误", e);
+		}
+		adminServer = null;
+	}
 
-    *//**
-     * Restarts the Jetty server instance.
-     *//*
-    public void restart() {
-        try {
-            adminServer.stop();
-            adminServer.start();
-        } catch (Exception e) {
-            log.error(e);
-        }
-    }
+	*//**
+	 * 重启Jetty服务
+	 *//*
+	public void restart() {
+		try {
+			adminServer.stop();
+			adminServer.start();
+		} catch (Exception e) {
+			log.error(e);
+		}
+	}
 
-    *//**
-     * Returns the collection of Jetty contexts used in the admin console.
-     *  
-     * @return the Jetty context handlers 
-     *//*
-    public ContextHandlerCollection getContexts() {
-        return contexts;
-    }
+	*//**
+	 * 获得admin console的Jetty上下文句柄
+	 * 
+	 * @return Jetty上下文句柄
+	 *//*
+	public ContextHandlerCollection getContexts() {
+		return contexts;
+	}
 
-    *//**
-     * Returns the host name of the admin console.
-     * 
-     * @return the host name of the admin console.
-     *//*
-    public String getAdminHost() {
-        return adminHost;
-    }
+	*//**
+	 * 获取admin console的主机名
+	 * 
+	 * @return
+	 *//*
+	public String getAdminHost() {
+		return adminHost;
+	}
 
-    *//**
-     * Returns the port of the admin console.
-     * 
-     * @return the port of the admin console.
-     *//*
-    public int getAdminPort() {
-        return adminPort;
-    }
+	*//**
+	 * 获得admin console端口
+	 * 
+	 * @return
+	 *//*
+	public int getAdminPort() {
+		return adminPort;
+	}
 
-    *//**
-     * Returns the start stutus of the admin console.
-     * 
-     * @return true if the admin console has been started, false otherwise.  
-     *//*
-    public boolean isHttpStarted() {
-        return httpStarted;
-    }
+	*//**
+	 * 获取admin console的启动状态
+	 * 
+	 * @return true：已启动；false：未启动
+	 *//*
+	public boolean isHttpStarted() {
+		return httpStarted;
+	}
 
 }
 */

@@ -21,10 +21,11 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 
-/** 
- *  Encoder class that does nothing (to the already encoded data). 
- *
- * @author Sehwan Noh (devnoh@gmail.com)
+/**
+ * XMPP编码器（继承自协议的编码器）
+ * 
+ * @author lijian
+ * @date 2016-12-4 上午12:02:47
  */
 public class XmppEncoder implements ProtocolEncoder {
 
