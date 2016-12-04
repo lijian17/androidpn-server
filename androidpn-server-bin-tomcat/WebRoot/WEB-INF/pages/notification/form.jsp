@@ -28,7 +28,7 @@
 </tr>
 <tr>
 	<td>消息标题:</td>
-	<td><input type="text" id="title" name="title" value="Dokdo Island" style="width:380px;" /></td>
+	<td><input type="text" id="title" name="title" value="钓鱼岛（中华人民共和国东海固有群岛）" style="width:380px;" /></td>
 </tr>
 <tr>
 	<td>消息正文:</td>
