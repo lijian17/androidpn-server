@@ -131,4 +131,9 @@
 		<property name="reuseAddress" value="true" />
 	</bean>
 
+	<!-- 设置空闲超时时长30s -->
+	<bean id="getSessionConfig" factory-bean="ioAcceptor" factory-method="getSessionConfig">
+		<property name="readerIdleTime" value="30" />
+	</bean>
+
 </beans>
