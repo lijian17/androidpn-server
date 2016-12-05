@@ -17,8 +17,15 @@
  */
 package org.androidpn.server.xmpp.push;
 
+import java.util.List;
 import java.util.Random;
 
+import org.androidpn.server.model.Notification;
+import org.androidpn.server.model.User;
+import org.androidpn.server.service.NotificationService;
+import org.androidpn.server.service.ServiceLocator;
+import org.androidpn.server.service.UserNotFoundException;
+import org.androidpn.server.service.UserService;
 import org.androidpn.server.xmpp.session.ClientSession;
 import org.androidpn.server.xmpp.session.SessionManager;
 import org.apache.commons.logging.Log;
@@ -42,11 +49,17 @@ public class NotificationManager {
 
 	private SessionManager sessionManager;
 
+	private NotificationService notificationService;
+
+	private UserService userService;
+
 	/**
 	 * 推送通知管理器
 	 */
 	public NotificationManager() {
 		sessionManager = SessionManager.getInstance();
+		notificationService = ServiceLocator.getNotificationService();
+		userService = ServiceLocator.getUserService();
 	}
 
 	/**
@@ -65,10 +78,17 @@ public class NotificationManager {
 			String uri) {
 		log.debug("sendBroadcast()...");
 		IQ notificationIQ = createNotificationIQ(apiKey, title, message, uri);
-		for (ClientSession session : sessionManager.getSessions()) {
-			if (session.getPresence().isAvailable()) {
+		List<User> allUser = userService.getUsers();
+		for (User user : allUser) {
+			ClientSession session = sessionManager.getSession(user
+					.getUsername());
+			if (session != null && session.getPresence().isAvailable()) {
+
 				notificationIQ.setTo(session.getAddress());
 				session.deliver(notificationIQ);
+			} else {
+				saveNotification(apiKey, user.getUsername(), title, message,
+						uri);
 			}
 		}
 	}
@@ -96,8 +116,32 @@ public class NotificationManager {
 			if (session.getPresence().isAvailable()) {
 				notificationIQ.setTo(session.getAddress());
 				session.deliver(notificationIQ);
+			} else {
+				saveNotification(apiKey, username, title, message, uri);
+			}
+		} else {
+			try {
+				User user = userService.getUserByUsername(username);
+				// 避免user非法存储到数据库（过滤垃圾数据）
+				if (user != null) {
+					saveNotification(apiKey, username, title, message, uri);
+				}
+			} catch (UserNotFoundException e) {
+				log.debug("未找到该用户：" + username);
+				e.printStackTrace();
 			}
 		}
+	}
+
+	private void saveNotification(String apiKey, String username, String title,
+			String message, String uri) {
+		Notification notification = new Notification();
+		notification.setApiKey(apiKey);
+		notification.setUsername(username);
+		notification.setTitle(title);
+		notification.setMessage(message);
+		notification.setUri(uri);
+		notificationService.saveNotification(notification);
 	}
 
 	/**

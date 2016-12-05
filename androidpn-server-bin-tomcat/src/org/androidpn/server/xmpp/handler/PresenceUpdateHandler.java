@@ -17,6 +17,12 @@
  */
 package org.androidpn.server.xmpp.handler;
 
+import java.util.List;
+
+import org.androidpn.server.model.Notification;
+import org.androidpn.server.service.NotificationService;
+import org.androidpn.server.service.ServiceLocator;
+import org.androidpn.server.xmpp.push.NotificationManager;
 import org.androidpn.server.xmpp.router.PacketDeliverer;
 import org.androidpn.server.xmpp.session.ClientSession;
 import org.androidpn.server.xmpp.session.Session;
@@ -36,70 +42,89 @@ import org.xmpp.packet.Presence;
  */
 public class PresenceUpdateHandler {
 
-    protected final Log log = LogFactory.getLog(getClass());
+	protected final Log log = LogFactory.getLog(getClass());
 
 	/** 连接到服务器的会话管理器 */
-    protected SessionManager sessionManager;
+	protected SessionManager sessionManager;
 
-    /**
-     * 这个类处理出席协议.
-     */
-    public PresenceUpdateHandler() {
-        sessionManager = SessionManager.getInstance();
-    }
+	private NotificationService notificationService;
+
+	private NotificationManager notificationManager;
+
+	/**
+	 * 这个类处理出席协议.
+	 */
+	public PresenceUpdateHandler() {
+		sessionManager = SessionManager.getInstance();
+		notificationService = ServiceLocator.getNotificationService();
+		notificationManager = new NotificationManager();
+	}
 
 	/**
 	 * 处理出席数据包
 	 * 
 	 * @param packet
 	 */
-    public void process(Packet packet) {
-        ClientSession session = sessionManager.getSession(packet.getFrom());
+	public void process(Packet packet) {
+		ClientSession session = sessionManager.getSession(packet.getFrom());
 
-        try {
-            Presence presence = (Presence) packet;
-            Presence.Type type = presence.getType();
+		try {
+			Presence presence = (Presence) packet;
+			Presence.Type type = presence.getType();
 
-            if (type == null) { // null == available
-                if (session != null
-                        && session.getStatus() == Session.STATUS_CLOSED) {
-                    log.warn("Rejected available presence: " + presence + " - "
-                            + session);
-                    return;
-                }
+			if (type == null) { // null == available
+				if (session != null
+						&& session.getStatus() == Session.STATUS_CLOSED) {
+					log.warn("Rejected available presence: " + presence + " - "
+							+ session);
+					return;
+				}
 
-                if (session != null) {
-                    session.setPresence(presence);
-                    if (!session.isInitialized()) {
-                        // initSession(session);
-                        session.setInitialized(true);
-                    }
-                }
+				if (session != null) {
+					session.setPresence(presence);
+					if (!session.isInitialized()) {
+						// initSession(session);
+						session.setInitialized(true);
+					}
+					List<Notification> list = notificationService
+							.findNotificationsByUsername(session.getUsername());
+					if (list != null && list.size() > 0) {
+						for (Notification notification : list) {
+							String apiKey = notification.getApiKey();
+							String title = notification.getTitle();
+							String message = notification.getMessage();
+							String uri = notification.getUri();
+							notificationManager.sendNotifcationToUser(apiKey,
+									session.getUsername(), title, message, uri);
+							notificationService.deleteNotification(notification);
+						}
+					}
+				}
 
-            } else if (Presence.Type.unavailable == type) {// 不可用的
+			} else if (Presence.Type.unavailable == type) {// 不可用的
 
-                if (session != null) {
-                    session.setPresence(presence);
-                }
+				if (session != null) {
+					session.setPresence(presence);
+				}
 
-            } else {
-                presence = presence.createCopy();
-                if (session != null) {
-                    presence.setFrom(new JID(null, session.getServerName(),
-                            null, true));
-                    presence.setTo(session.getAddress());
-                } else {
-                    JID sender = presence.getFrom();
-                    presence.setFrom(presence.getTo());
-                    presence.setTo(sender);
-                }
-                presence.setError(PacketError.Condition.bad_request);
-                PacketDeliverer.deliver(presence);
-            }
+			} else {
+				presence = presence.createCopy();
+				if (session != null) {
+					presence.setFrom(new JID(null, session.getServerName(),
+							null, true));
+					presence.setTo(session.getAddress());
+				} else {
+					JID sender = presence.getFrom();
+					presence.setFrom(presence.getTo());
+					presence.setTo(sender);
+				}
+				presence.setError(PacketError.Condition.bad_request);
+				PacketDeliverer.deliver(presence);
+			}
 
-        } catch (Exception e) {
+		} catch (Exception e) {
 			log.error("内部服务器错误. Triggered by packet: " + packet, e);
-        }
-    }
+		}
+	}
 
 }

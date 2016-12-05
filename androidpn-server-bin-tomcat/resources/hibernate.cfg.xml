@@ -37,6 +37,7 @@
 
 		<!-- Mapping Files -->
 		<mapping class="org.androidpn.server.model.User" />
+		<mapping class="org.androidpn.server.model.Notification" />
 
 	</session-factory>
 </hibernate-configuration>

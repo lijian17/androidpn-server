@@ -29,6 +29,8 @@ public class ServiceLocator {
 
     public static String USER_SERVICE = "userService";
 
+    public static String NOTIFICATION_SERVICE = "notificationService";
+
 	/**
 	 * 根据名称获取一个服务对象
 	 * 
@@ -47,6 +49,15 @@ public class ServiceLocator {
 	 */
     public static UserService getUserService() {
         return (UserService) XmppServer.getInstance().getBean(USER_SERVICE);
+    }
+    
+    /**
+     * 获得消息服务
+     * 
+     * @return
+     */
+    public static NotificationService getNotificationService() {
+    	return (NotificationService) XmppServer.getInstance().getBean(NOTIFICATION_SERVICE);
     }
 
 }
