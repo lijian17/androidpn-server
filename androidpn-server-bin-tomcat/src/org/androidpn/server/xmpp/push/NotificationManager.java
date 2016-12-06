@@ -77,19 +77,21 @@ public class NotificationManager {
 	public void sendBroadcast(String apiKey, String title, String message,
 			String uri) {
 		log.debug("sendBroadcast()...");
-		IQ notificationIQ = createNotificationIQ(apiKey, title, message, uri);
 		List<User> allUser = userService.getUsers();
 		for (User user : allUser) {
+			Random random = new Random();
+			String id = Integer.toHexString(random.nextInt());
+			IQ notificationIQ = createNotificationIQ(id, apiKey, title,
+					message, uri);
 			ClientSession session = sessionManager.getSession(user
 					.getUsername());
 			if (session != null && session.getPresence().isAvailable()) {
 
 				notificationIQ.setTo(session.getAddress());
 				session.deliver(notificationIQ);
-			} else {
-				saveNotification(apiKey, user.getUsername(), title, message,
-						uri);
 			}
+			saveNotification(apiKey, user.getUsername(), title, message, uri,
+					id);
 		}
 	}
 
@@ -108,49 +110,50 @@ public class NotificationManager {
 	 *            消息URI
 	 */
 	public void sendNotifcationToUser(String apiKey, String username,
-			String title, String message, String uri) {
+			String title, String message, String uri, boolean shouldSave) {
 		log.debug("sendNotifcationToUser()...");
-		IQ notificationIQ = createNotificationIQ(apiKey, title, message, uri);
+		Random random = new Random();
+		String id = Integer.toHexString(random.nextInt());
+		IQ notificationIQ = createNotificationIQ(id, apiKey, title, message,
+				uri);
 		ClientSession session = sessionManager.getSession(username);
 		if (session != null) {
 			if (session.getPresence().isAvailable()) {
 				notificationIQ.setTo(session.getAddress());
 				session.deliver(notificationIQ);
-			} else {
-				saveNotification(apiKey, username, title, message, uri);
 			}
-		} else {
-			try {
-				User user = userService.getUserByUsername(username);
-				// 避免user非法存储到数据库（过滤垃圾数据）
-				if (user != null) {
-					saveNotification(apiKey, username, title, message, uri);
-				}
-			} catch (UserNotFoundException e) {
-				log.debug("未找到该用户：" + username);
-				e.printStackTrace();
+		}
+		try {
+			User user = userService.getUserByUsername(username);
+			// 避免user非法存储到数据库（过滤垃圾数据）
+			if (user != null && shouldSave) {
+				saveNotification(apiKey, username, title, message, uri, id);
 			}
+		} catch (UserNotFoundException e) {
+			log.debug("未找到该用户：" + username);
+			e.printStackTrace();
 		}
 	}
 
 	private void saveNotification(String apiKey, String username, String title,
-			String message, String uri) {
+			String message, String uri, String uuid) {
 		Notification notification = new Notification();
 		notification.setApiKey(apiKey);
 		notification.setUsername(username);
 		notification.setTitle(title);
 		notification.setMessage(message);
 		notification.setUri(uri);
+		notification.setUuid(uuid);
 		notificationService.saveNotification(notification);
 	}
 
 	/**
 	 * 创建一个新的通知IQ，并返回它。
 	 */
-	private IQ createNotificationIQ(String apiKey, String title,
+	private IQ createNotificationIQ(String id, String apiKey, String title,
 			String message, String uri) {
-		Random random = new Random();
-		String id = Integer.toHexString(random.nextInt());
+		// Random random = new Random();
+		// String id = Integer.toHexString(random.nextInt());
 		// String id = String.valueOf(System.currentTimeMillis());
 
 		Element notification = DocumentHelper.createElement(QName.get(

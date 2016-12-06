@@ -38,4 +38,7 @@ public interface NotificationService {
 	
 	/** 删除消息 */
 	public void deleteNotification(Notification notification);
+	
+	/** 根据UUID删除消息 */
+	public void deleteNotificationByUUID(String uuid);
 }

@@ -51,7 +51,7 @@ public class NotificationApiController extends MultiActionController {
 			notificationManager.sendBroadcast(apiKey, title, message, uri);
 		} else {
 			notificationManager.sendNotifcationToUser(apiKey, username, title,
-					message, uri);
+					message, uri, true);
 		}
 		
 		response.getWriter().print("{\"result\":\"0\",\"description\":\"success\"}");
