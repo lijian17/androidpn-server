@@ -39,7 +39,7 @@ public class IQDeliverConfirmHandler extends IQHandler {
 
 		if (session.getStatus() == Session.STATUS_AUTHENTICATED) {
 			if (IQ.Type.set.equals(packet.getType())) {
-				Element element = packet.getElement();
+				Element element = packet.getChildElement();
 				String uuid = element.elementText("uuid");
 				notificationService.deleteNotificationByUUID(uuid);
 			}
