@@ -18,13 +18,18 @@
 <tr>
 	<td width="20%">发送给:</td>
 	<td width="80%">
-		<input type="radio" name="broadcast" value="Y" checked="checked" />  全体 (广播) 
-        <input type="radio" name="broadcast" value="N" /> 指定设备 
+		<input type="radio" name="broadcast" value="0" checked="checked" />  全体 (广播) 
+        <input type="radio" name="broadcast" value="1" /> 指定用户名 
+        <input type="radio" name="broadcast" value="2" /> 指定别名
 	</td>
 </tr>
 <tr id="trUsername" style="display:none;">
 	<td>用户名:</td>
 	<td><input type="text" id="username" name="username" value="" style="width:380px;" /></td>
+</tr>
+<tr id="trAlias" style="display:none;">
+	<td>别名:</td>
+	<td><input type="text" id="alias" name="alias" value="" style="width:380px;" /></td>
 </tr>
 <tr>
 	<td>消息标题:</td>
@@ -61,16 +66,26 @@ $(function() {
 	$('input[name=broadcast]').click(function() {
 		if ($('input[name=broadcast]')[0].checked) {
 			$('#trUsername').hide();
-		} else {
+			$('#trAlias').hide();
+		} else if ($('input[name=broadcast]')[1].checked) {
 			$('#trUsername').show();
+			$('#trAlias').hide();
+		} else if ($('input[name=broadcast]')[2].checked) {
+			$('#trUsername').hide();
+			$('#trAlias').show();
 		}
 	});
 	
 	if ($('input[name=broadcast]')[0].checked) {
 		$('#trUsername').hide();
-	} else {
+		$('#trAlias').hide();
+	} else if ($('input[name=broadcast]')[1].checked) {
 		$('#trUsername').show();
-	}	
+		$('#trAlias').hide();
+	} else if ($('input[name=broadcast]')[2].checked) {
+		$('#trUsername').hide();
+		$('#trAlias').show();
+	}
 });
  
 //]]>

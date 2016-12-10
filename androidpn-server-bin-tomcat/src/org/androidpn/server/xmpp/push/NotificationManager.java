@@ -137,6 +137,31 @@ public class NotificationManager {
 		}
 	}
 
+	/**
+	 * 根据别名向特定用户发送新创建的通知消息
+	 * 
+	 * @param apiKey
+	 *            密钥
+	 * @param alias
+	 *            别名
+	 * @param title
+	 *            消息标题
+	 * @param message
+	 *            消息详情
+	 * @param uri
+	 *            消息URI
+	 * @param shouldSave
+	 *            是否要保存该消息
+	 */
+	public void sendNotificationByAlias(String apiKey, String alias,
+			String title, String message, String uri, boolean shouldSave) {
+		String username = sessionManager.getUsernameByAlias(alias);
+		if (username != null) {
+			sendNotifcationToUser(apiKey, username, title, message, uri,
+					shouldSave);
+		}
+	}
+
 	private void saveNotification(String apiKey, String username, String title,
 			String message, String uri, String uuid) {
 		Notification notification = new Notification();

@@ -55,6 +55,9 @@ public class SessionManager {
 	/** 客户端会话集 */
 	private Map<String, ClientSession> clientSessions = new ConcurrentHashMap<String, ClientSession>();
 
+	/** 用户别名 */
+	private Map<String, String> aliasUsernameMap = new ConcurrentHashMap<String, String>();
+
 	/** 用户会话计数器 */
 	private final AtomicInteger connectionsCounter = new AtomicInteger(0);
 
@@ -221,6 +224,30 @@ public class SessionManager {
 				log.error("无法关闭socket", e);
 			}
 		}
+	}
+
+	/**
+	 * 设置别名
+	 * 
+	 * @param username
+	 *            用户名
+	 * @param alias
+	 *            别名
+	 */
+	public void setUserAlias(String username, String alias) {
+		aliasUsernameMap.put(alias, username);
+	}
+
+	/**
+	 * 根据别名获取用户名
+	 * 
+	 * @param alias
+	 *            别名
+	 * @return 用户名
+	 */
+	public String getUsernameByAlias(String alias) {
+		String username = aliasUsernameMap.get(alias);
+		return username;
 	}
 
 }
