@@ -108,6 +108,8 @@ public class NotificationManager {
 	 *            消息详情
 	 * @param uri
 	 *            消息URI
+	 * @param shouldSave
+	 *            是否要保存该消息
 	 */
 	public void sendNotifcationToUser(String apiKey, String username,
 			String title, String message, String uri, boolean shouldSave) {
