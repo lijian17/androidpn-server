@@ -82,6 +82,8 @@ public class NotificationManager {
 		for (User user : allUser) {
 			Random random = new Random();
 			String id = Integer.toHexString(random.nextInt());
+			saveNotification(apiKey, user.getUsername(), title, message, uri,
+					id);
 			IQ notificationIQ = createNotificationIQ(id, apiKey, title,
 					message, uri);
 			ClientSession session = sessionManager.getSession(user
@@ -91,8 +93,6 @@ public class NotificationManager {
 				notificationIQ.setTo(session.getAddress());
 				session.deliver(notificationIQ);
 			}
-			saveNotification(apiKey, user.getUsername(), title, message, uri,
-					id);
 		}
 	}
 
@@ -117,15 +117,6 @@ public class NotificationManager {
 		log.debug("sendNotifcationToUser()...");
 		Random random = new Random();
 		String id = Integer.toHexString(random.nextInt());
-		IQ notificationIQ = createNotificationIQ(id, apiKey, title, message,
-				uri);
-		ClientSession session = sessionManager.getSession(username);
-		if (session != null) {
-			if (session.getPresence().isAvailable()) {
-				notificationIQ.setTo(session.getAddress());
-				session.deliver(notificationIQ);
-			}
-		}
 		try {
 			User user = userService.getUserByUsername(username);
 			// 避免user非法存储到数据库（过滤垃圾数据）
@@ -135,6 +126,15 @@ public class NotificationManager {
 		} catch (UserNotFoundException e) {
 			log.debug("未找到该用户：" + username);
 			e.printStackTrace();
+		}
+		IQ notificationIQ = createNotificationIQ(id, apiKey, title, message,
+				uri);
+		ClientSession session = sessionManager.getSession(username);
+		if (session != null) {
+			if (session.getPresence().isAvailable()) {
+				notificationIQ.setTo(session.getAddress());
+				session.deliver(notificationIQ);
+			}
 		}
 	}
 
