@@ -21,6 +21,7 @@
 		<input type="radio" name="broadcast" value="0" checked="checked" />  全体 (广播) 
         <input type="radio" name="broadcast" value="1" /> 指定用户名 
         <input type="radio" name="broadcast" value="2" /> 指定别名
+        <input type="radio" name="broadcast" value="3" /> 指定标签
 	</td>
 </tr>
 <tr id="trUsername" style="display:none;">
@@ -30,6 +31,10 @@
 <tr id="trAlias" style="display:none;">
 	<td>别名:</td>
 	<td><input type="text" id="alias" name="alias" value="" style="width:380px;" /></td>
+</tr>
+<tr id="trTag" style="display:none;">
+	<td>标签:</td>
+	<td><input type="text" id="tag" name="tag" value="" style="width:380px;" /></td>
 </tr>
 <tr>
 	<td>消息标题:</td>
@@ -67,24 +72,38 @@ $(function() {
 		if ($('input[name=broadcast]')[0].checked) {
 			$('#trUsername').hide();
 			$('#trAlias').hide();
+			$('#trTag').hide();
 		} else if ($('input[name=broadcast]')[1].checked) {
 			$('#trUsername').show();
 			$('#trAlias').hide();
+			$('#trTag').hide();
 		} else if ($('input[name=broadcast]')[2].checked) {
 			$('#trUsername').hide();
 			$('#trAlias').show();
+			$('#trTag').hide();
+		} else if ($('input[name=broadcast]')[3].checked) {
+			$('#trUsername').hide();
+			$('#trAlias').hide();
+			$('#trTag').show();
 		}
 	});
 	
 	if ($('input[name=broadcast]')[0].checked) {
 		$('#trUsername').hide();
 		$('#trAlias').hide();
+		$('#trTag').hide();
 	} else if ($('input[name=broadcast]')[1].checked) {
 		$('#trUsername').show();
 		$('#trAlias').hide();
+		$('#trTag').hide();
 	} else if ($('input[name=broadcast]')[2].checked) {
 		$('#trUsername').hide();
 		$('#trAlias').show();
+		$('#trTag').hide();
+	} else if ($('input[name=broadcast]')[3].checked) {
+		$('#trUsername').hide();
+		$('#trAlias').hide();
+		$('#trTag').show();
 	}
 });
  

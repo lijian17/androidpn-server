@@ -19,6 +19,7 @@ package org.androidpn.server.xmpp.push;
 
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import org.androidpn.server.model.Notification;
 import org.androidpn.server.model.User;
@@ -162,6 +163,43 @@ public class NotificationManager {
 		}
 	}
 
+	/**
+	 * 根据标签向特定用户集合发送新创建的通知消息
+	 * 
+	 * @param apiKey
+	 *            密钥
+	 * @param tag
+	 *            标签
+	 * @param title
+	 *            消息标题
+	 * @param message
+	 *            消息详情
+	 * @param uri
+	 *            消息URI
+	 * @param shouldSave
+	 *            是否要保存该消息
+	 */
+	public void sendNotificationByTag(String apiKey, String tag, String title,
+			String message, String uri, boolean shouldSave) {
+		Set<String> usernameSet = sessionManager.getUsernameByTag(tag);
+		if (usernameSet != null && !usernameSet.isEmpty()) {
+			for (String username : usernameSet) {
+				sendNotifcationToUser(apiKey, username, title, message, uri,
+						shouldSave);
+			}
+		}
+	}
+
+	/**
+	 * 保存消息至数据库
+	 * 
+	 * @param apiKey
+	 * @param username
+	 * @param title
+	 * @param message
+	 * @param uri
+	 * @param uuid
+	 */
 	private void saveNotification(String apiKey, String username, String title,
 			String message, String uri, String uuid) {
 		Notification notification = new Notification();

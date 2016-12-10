@@ -30,6 +30,7 @@ import org.androidpn.server.xmpp.net.Connection;
 import org.androidpn.server.xmpp.net.ConnectionCloseListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.mina.util.ConcurrentHashSet;
 import org.xmpp.packet.JID;
 
 /**
@@ -57,6 +58,9 @@ public class SessionManager {
 
 	/** 用户别名 */
 	private Map<String, String> aliasUsernameMap = new ConcurrentHashMap<String, String>();
+
+	/** 标签用户名集合 */
+	private Map<String, ConcurrentHashSet<String>> tagUsernamesMap = new ConcurrentHashMap<String, ConcurrentHashSet<String>>();
 
 	/** 用户会话计数器 */
 	private final AtomicInteger connectionsCounter = new AtomicInteger(0);
@@ -250,4 +254,34 @@ public class SessionManager {
 		return username;
 	}
 
+	/**
+	 * 设置用户标签
+	 * 
+	 * @param username
+	 *            用户名
+	 * @param tag
+	 *            该用户所关注的标签
+	 */
+	public void setUserTag(String username, String tag) {
+		ConcurrentHashSet<String> hashSet = tagUsernamesMap.get(tag);
+		if (hashSet == null) {
+			ConcurrentHashSet<String> set = new ConcurrentHashSet<String>();
+			set.add(username);
+			tagUsernamesMap.put(tag, set);
+		} else {
+			// set集合有自动去重属性，不用担心用户名重名问题
+			hashSet.add(username);
+		}
+	}
+
+	/**
+	 * 根据标签获取用户集合
+	 * 
+	 * @param tag
+	 *            标签
+	 * @return 用户集合
+	 */
+	public Set<String> getUsernameByTag(String tag) {
+		return tagUsernamesMap.get(tag);
+	}
 }

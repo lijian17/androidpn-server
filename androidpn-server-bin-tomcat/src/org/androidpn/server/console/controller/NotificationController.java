@@ -55,6 +55,7 @@ public class NotificationController extends MultiActionController {
 		String username = ServletRequestUtils.getStringParameter(request,
 				"username");
 		String alias = ServletRequestUtils.getStringParameter(request, "alias");
+		String tag = ServletRequestUtils.getStringParameter(request, "tag");
 		String title = ServletRequestUtils.getStringParameter(request, "title");
 		String message = ServletRequestUtils.getStringParameter(request,
 				"message");
@@ -70,6 +71,9 @@ public class NotificationController extends MultiActionController {
 					message, uri, true);
 		} else if (broadcast.equals("2")) {
 			notificationManager.sendNotificationByAlias(apiKey, alias, title,
+					message, uri, true);
+		} else if (broadcast.equals("3")) {
+			notificationManager.sendNotificationByTag(apiKey, tag, title,
 					message, uri, true);
 		}
 
