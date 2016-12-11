@@ -13,7 +13,7 @@
 
 <%--<div style="background:#eee; margin:20px 0px; padding:20px; width:500px; border:solid 1px #999;">--%>
 <div style="margin:20px 0px;">
-<form action="notification.do?action=send" method="post" style="margin: 0px;">
+<form action="notification.do?action=send" method="post" style="margin: 0px;" enctype="multipart/form-data">
 <table width="600" cellpadding="4" cellspacing="0" border="0">
 <tr>
 	<td width="20%">发送给:</td>
@@ -54,6 +54,12 @@
 	<td>URI:</td>
 	<td><input type="text" id="uri" name="uri" value="" style="width:380px;" />
 	    <br/><span style="font-size:0.8em">示例) http://www.baidu.com, geo:25.7519730000,123.4861640000, tel:150-1099-0415</span>
+	</td>
+</tr>
+<tr>
+	<td>图片:</td>
+	<td><input type="file" id="image" name="image" value="" style="width:380px;" />
+	    <br/><span style="font-size:0.8em">请上传一张图片</span>
 	</td>
 </tr>
 <tr>

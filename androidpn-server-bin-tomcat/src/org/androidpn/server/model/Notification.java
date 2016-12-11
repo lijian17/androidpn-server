@@ -17,28 +17,31 @@ import javax.persistence.Table;
 @Table(name = "notification")
 public class Notification {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 
-    @Column(name = "api_key", length = 64)
+	@Column(name = "api_key", length = 64)
 	private String apiKey;
-    
-    @Column(name = "username", nullable = false, length = 64)
+
+	@Column(name = "username", nullable = false, length = 64)
 	private String username;
 
-    @Column(name = "title", nullable = false, length = 64)
+	@Column(name = "title", nullable = false, length = 64)
 	private String title;
 
-    @Column(name = "message", nullable = false, length = 1000)
+	@Column(name = "message", nullable = false, length = 1000)
 	private String message;
 
-    @Column(name = "uri", length = 256)
+	@Column(name = "uri", length = 256)
 	private String uri;
-    
-    @Column(name = "uuid", length = 64, nullable = false, unique = true)
-    private String uuid;
-    
+
+	@Column(name = "image_url", length = 256)
+	private String imageUrl;
+
+	@Column(name = "uuid", length = 64, nullable = false, unique = true)
+	private String uuid;
+
 	public long getId() {
 		return id;
 	}
@@ -85,6 +88,14 @@ public class Notification {
 
 	public void setUri(String uri) {
 		this.uri = uri;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
 	}
 
 	public String getUuid() {

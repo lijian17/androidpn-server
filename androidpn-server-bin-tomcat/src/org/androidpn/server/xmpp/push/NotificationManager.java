@@ -74,18 +74,20 @@ public class NotificationManager {
 	 *            消息详情
 	 * @param uri
 	 *            消息URI
+	 * @param imageUrl
+	 *            图片地址
 	 */
 	public void sendBroadcast(String apiKey, String title, String message,
-			String uri) {
+			String uri, String imageUrl) {
 		log.debug("sendBroadcast()...");
 		List<User> allUser = userService.getUsers();
 		for (User user : allUser) {
 			Random random = new Random();
 			String id = Integer.toHexString(random.nextInt());
 			saveNotification(apiKey, user.getUsername(), title, message, uri,
-					id);
+					imageUrl, id);
 			IQ notificationIQ = createNotificationIQ(id, apiKey, title,
-					message, uri);
+					message, uri, imageUrl);
 			ClientSession session = sessionManager.getSession(user
 					.getUsername());
 			if (session != null && session.getPresence().isAvailable()) {
@@ -109,11 +111,14 @@ public class NotificationManager {
 	 *            消息详情
 	 * @param uri
 	 *            消息URI
+	 * @param imageUrl
+	 *            图片地址
 	 * @param shouldSave
 	 *            是否要保存该消息
 	 */
 	public void sendNotifcationToUser(String apiKey, String username,
-			String title, String message, String uri, boolean shouldSave) {
+			String title, String message, String uri, String imageUrl,
+			boolean shouldSave) {
 		log.debug("sendNotifcationToUser()...");
 		Random random = new Random();
 		String id = Integer.toHexString(random.nextInt());
@@ -121,14 +126,15 @@ public class NotificationManager {
 			User user = userService.getUserByUsername(username);
 			// 避免user非法存储到数据库（过滤垃圾数据）
 			if (user != null && shouldSave) {
-				saveNotification(apiKey, username, title, message, uri, id);
+				saveNotification(apiKey, username, title, message, uri,
+						imageUrl, id);
 			}
 		} catch (UserNotFoundException e) {
 			log.debug("未找到该用户：" + username);
 			e.printStackTrace();
 		}
 		IQ notificationIQ = createNotificationIQ(id, apiKey, title, message,
-				uri);
+				uri, imageUrl);
 		ClientSession session = sessionManager.getSession(username);
 		if (session != null) {
 			if (session.getPresence().isAvailable()) {
@@ -151,15 +157,18 @@ public class NotificationManager {
 	 *            消息详情
 	 * @param uri
 	 *            消息URI
+	 * @param imageUil
+	 *            图片地址
 	 * @param shouldSave
 	 *            是否要保存该消息
 	 */
 	public void sendNotificationByAlias(String apiKey, String alias,
-			String title, String message, String uri, boolean shouldSave) {
+			String title, String message, String uri, String imageUil,
+			boolean shouldSave) {
 		String username = sessionManager.getUsernameByAlias(alias);
 		if (username != null) {
 			sendNotifcationToUser(apiKey, username, title, message, uri,
-					shouldSave);
+					imageUil, shouldSave);
 		}
 	}
 
@@ -176,16 +185,18 @@ public class NotificationManager {
 	 *            消息详情
 	 * @param uri
 	 *            消息URI
+	 * @param imageUrl
+	 *            图片地址
 	 * @param shouldSave
 	 *            是否要保存该消息
 	 */
 	public void sendNotificationByTag(String apiKey, String tag, String title,
-			String message, String uri, boolean shouldSave) {
+			String message, String uri, String imageUrl, boolean shouldSave) {
 		Set<String> usernameSet = sessionManager.getUsernameByTag(tag);
 		if (usernameSet != null && !usernameSet.isEmpty()) {
 			for (String username : usernameSet) {
 				sendNotifcationToUser(apiKey, username, title, message, uri,
-						shouldSave);
+						imageUrl, shouldSave);
 			}
 		}
 	}
@@ -198,25 +209,29 @@ public class NotificationManager {
 	 * @param title
 	 * @param message
 	 * @param uri
+	 * @param imageUrl
 	 * @param uuid
 	 */
 	private void saveNotification(String apiKey, String username, String title,
-			String message, String uri, String uuid) {
+			String message, String uri, String imageUrl, String uuid) {
 		Notification notification = new Notification();
 		notification.setApiKey(apiKey);
 		notification.setUsername(username);
 		notification.setTitle(title);
 		notification.setMessage(message);
 		notification.setUri(uri);
+		notification.setImageUrl(imageUrl);
 		notification.setUuid(uuid);
 		notificationService.saveNotification(notification);
 	}
 
 	/**
 	 * 创建一个新的通知IQ，并返回它。
+	 * 
+	 * @param imageUrl
 	 */
 	private IQ createNotificationIQ(String id, String apiKey, String title,
-			String message, String uri) {
+			String message, String uri, String imageUrl) {
 		// Random random = new Random();
 		// String id = Integer.toHexString(random.nextInt());
 		// String id = String.valueOf(System.currentTimeMillis());
@@ -228,6 +243,7 @@ public class NotificationManager {
 		notification.addElement("title").setText(title);
 		notification.addElement("message").setText(message);
 		notification.addElement("uri").setText(uri);
+		notification.addElement("imageUrl").setText(imageUrl);
 
 		IQ iq = new IQ();
 		iq.setType(IQ.Type.set);
