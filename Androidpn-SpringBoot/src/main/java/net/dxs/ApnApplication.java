@@ -1,13 +1,13 @@
-package net.dxs.AndroidpnSpringBoot;
+package net.dxs;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AndroidpnSpringBootApplication {
+public class ApnApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AndroidpnSpringBootApplication.class, args);
+		SpringApplication.run(ApnApplication.class, args);
 	}
 
 }
