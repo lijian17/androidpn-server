@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="net.dxs.mapper.NotificationMapper" >
+  <resultMap id="BaseResultMap" type="net.dxs.pojo.Notification" >
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="api_key" property="apiKey" jdbcType="VARCHAR" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="uuid" property="uuid" jdbcType="VARCHAR" />
+    <result column="message" property="message" jdbcType="LONGVARCHAR" />
+    <result column="uri" property="uri" jdbcType="LONGVARCHAR" />
+    <result column="image_url" property="imageUrl" jdbcType="LONGVARCHAR" />
+  </resultMap>
+</mapper>

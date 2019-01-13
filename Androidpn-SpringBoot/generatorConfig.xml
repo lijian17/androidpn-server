@@ -32,5 +32,6 @@
 			type="XMLMAPPER" />
 
 		<table tableName="apn_user"></table>
+		<table tableName="notification"></table>
 	</context>
 </generatorConfiguration>
