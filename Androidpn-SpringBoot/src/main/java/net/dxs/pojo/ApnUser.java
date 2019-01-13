@@ -1,13 +1,20 @@
 package net.dxs.pojo;
 
 import java.util.Date;
-import javax.persistence.*;
+
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Table(name = "apn_user")
 public class ApnUser {
     @Id
     private Long id;
 
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     @Column(name = "created_date")
     private Date createdDate;
 
@@ -15,8 +22,10 @@ public class ApnUser {
 
     private String name;
 
+	@JsonIgnore
     private String password;
 
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     @Column(name = "updated_date")
     private Date updatedDate;
 

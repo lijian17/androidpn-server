@@ -72,7 +72,6 @@ public class UserController {
 	@RequestMapping("/queryUserList")
 	public ApnJSONResult queryUserList() {
 		ApnUser user = new ApnUser();
-		user.setUsername("4");
 		List<ApnUser> userList = userService.queryUserList(user);
 		return ApnJSONResult.ok(userList);
 	}
@@ -82,7 +81,7 @@ public class UserController {
 		if (page == null) {
 			page = 1;
 		}
-		int pageSize = 2;
+		int pageSize = 10;
 		ApnUser user = new ApnUser();
 		// user.setNickname("lijian");
 		List<ApnUser> userList = userService.queryUserListPaged(user, page, pageSize);

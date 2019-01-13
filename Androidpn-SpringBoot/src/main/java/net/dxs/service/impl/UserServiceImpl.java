@@ -51,6 +51,17 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS)
+	public ApnUser getUserByUsername(String username) {
+		Example example = new Example(ApnUser.class);
+		Example.Criteria criteria = example.createCriteria();
+		if(!StringUtils.isEmptyOrWhitespace(username)) {
+			criteria.andLike("username", username);
+		}
+		return userMapper.selectOneByExample(example);
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.SUPPORTS)
 	public List<ApnUser> queryUserList(ApnUser user) {
 		Example example = new Example(ApnUser.class);
 		Example.Criteria criteria = example.createCriteria();

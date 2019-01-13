@@ -14,6 +14,8 @@ public interface UserService {
 
 	public ApnUser queryUserById(String userId);
 
+	public ApnUser getUserByUsername(String username);
+
 	public List<ApnUser> queryUserList(ApnUser user);
 
 	public List<ApnUser> queryUserListPaged(ApnUser user, Integer page, Integer pageSize);
