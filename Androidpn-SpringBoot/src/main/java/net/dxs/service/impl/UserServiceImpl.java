@@ -13,6 +13,7 @@ import com.github.pagehelper.PageHelper;
 import net.dxs.mapper.ApnUserMapper;
 import net.dxs.mapper.ApnUserMapperCustom;
 import net.dxs.pojo.ApnUser;
+import net.dxs.service.UserNotFoundException;
 import net.dxs.service.UserService;
 import tk.mybatis.mapper.entity.Example;
 
@@ -51,13 +52,19 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional(propagation = Propagation.SUPPORTS)
-	public ApnUser getUserByUsername(String username) {
+	public ApnUser getUserByUsername(String username) throws UserNotFoundException {
 		Example example = new Example(ApnUser.class);
 		Example.Criteria criteria = example.createCriteria();
-		if(!StringUtils.isEmptyOrWhitespace(username)) {
+		if (!StringUtils.isEmptyOrWhitespace(username)) {
 			criteria.andLike("username", username);
 		}
 		return userMapper.selectOneByExample(example);
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.SUPPORTS)
+	public List<ApnUser> getUsers() {
+		return userMapper.selectAll();
 	}
 
 	@Override

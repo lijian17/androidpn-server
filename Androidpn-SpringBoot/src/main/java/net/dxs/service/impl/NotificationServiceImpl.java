@@ -19,9 +19,15 @@ package net.dxs.service.impl;
 
 import java.util.List;
 
-import javax.management.Notification;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.util.StringUtils;
 
+import net.dxs.mapper.NotificationMapper;
+import net.dxs.pojo.Notification;
 import net.dxs.service.NotificationService;
+import tk.mybatis.mapper.entity.Example;
 
 /**
  * NotificationService的实现类
@@ -31,31 +37,49 @@ import net.dxs.service.NotificationService;
  */
 public class NotificationServiceImpl implements NotificationService {
 
-	private NotificationDao notificationDao;
-	
-	public NotificationDao getNotificationDao() {
-		return notificationDao;
+	@Autowired
+	private NotificationMapper notificationMapper;
+
+	public NotificationMapper getNotificationMapper() {
+		return notificationMapper;
 	}
 
-	public void setNotificationDao(NotificationDao notificationDao) {
-		this.notificationDao = notificationDao;
+	public void setNotificationMapper(NotificationMapper notificationMapper) {
+		this.notificationMapper = notificationMapper;
 	}
 
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
 	public void saveNotification(Notification notification) {
-		notificationDao.saveNotification(notification);
+		notificationMapper.insert(notification);
 	}
 
+	@Override
+	@Transactional(propagation = Propagation.SUPPORTS)
 	public List<Notification> findNotificationsByUsername(String username) {
-		return notificationDao.findNotificationsByUsername(username);
+		Example example = new Example(Notification.class);
+		Example.Criteria criteria = example.createCriteria();
+		if (!StringUtils.isEmptyOrWhitespace(username)) {
+			criteria.andLike("username", username);
+		}
+		return notificationMapper.selectByExample(example);
 	}
 
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
 	public void deleteNotification(Notification notification) {
-		notificationDao.deleteNotification(notification);
+		notificationMapper.delete(notification);
 	}
 
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
 	public void deleteNotificationByUUID(String uuid) {
-		notificationDao.deleteNotificationByUUID(uuid);
+		Example example = new Example(Notification.class);
+		Example.Criteria criteria = example.createCriteria();
+		if (!StringUtils.isEmptyOrWhitespace(uuid)) {
+			criteria.andLike("uuid", uuid);
+		}
+		notificationMapper.deleteByExample(example);
 	}
-
 
 }

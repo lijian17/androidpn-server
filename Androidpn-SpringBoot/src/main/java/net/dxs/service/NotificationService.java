@@ -19,7 +19,7 @@ package net.dxs.service;
 
 import java.util.List;
 
-import javax.management.Notification;
+import net.dxs.pojo.Notification;
 
 
 /**

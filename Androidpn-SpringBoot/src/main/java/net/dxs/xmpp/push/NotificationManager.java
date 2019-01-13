@@ -21,20 +21,21 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.androidpn.server.model.Notification;
-import org.androidpn.server.model.User;
-import org.androidpn.server.service.NotificationService;
-import org.androidpn.server.service.ServiceLocator;
-import org.androidpn.server.service.UserNotFoundException;
-import org.androidpn.server.service.UserService;
-import org.androidpn.server.xmpp.session.ClientSession;
-import org.androidpn.server.xmpp.session.SessionManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.xmpp.packet.IQ;
+
+import net.dxs.pojo.ApnUser;
+import net.dxs.pojo.Notification;
+import net.dxs.service.NotificationService;
+import net.dxs.service.ServiceLocator;
+import net.dxs.service.UserNotFoundException;
+import net.dxs.service.UserService;
+import net.dxs.xmpp.session.ClientSession;
+import net.dxs.xmpp.session.SessionManager;
 
 /**
  * 推送通知管理器
@@ -80,8 +81,8 @@ public class NotificationManager {
 	public void sendBroadcast(String apiKey, String title, String message,
 			String uri, String imageUrl) {
 		log.debug("sendBroadcast()...");
-		List<User> allUser = userService.getUsers();
-		for (User user : allUser) {
+		List<ApnUser> allUser = userService.getUsers();
+		for (ApnUser user : allUser) {
 			Random random = new Random();
 			String id = Integer.toHexString(random.nextInt());
 			saveNotification(apiKey, user.getUsername(), title, message, uri,
@@ -123,7 +124,7 @@ public class NotificationManager {
 		Random random = new Random();
 		String id = Integer.toHexString(random.nextInt());
 		try {
-			User user = userService.getUserByUsername(username);
+			ApnUser user = userService.getUserByUsername(username);
 			// 避免user非法存储到数据库（过滤垃圾数据）
 			if (user != null && shouldSave) {
 				saveNotification(apiKey, username, title, message, uri,

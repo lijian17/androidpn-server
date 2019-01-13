@@ -21,10 +21,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Random;
 
-import org.androidpn.server.util.Config;
-import org.androidpn.server.xmpp.router.PacketRouter;
-import org.androidpn.server.xmpp.session.ClientSession;
-import org.androidpn.server.xmpp.session.Session;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Element;
@@ -38,6 +34,11 @@ import org.xmpp.packet.PacketError;
 import org.xmpp.packet.Presence;
 import org.xmpp.packet.Roster;
 import org.xmpp.packet.StreamError;
+
+import net.dxs.utils.Config;
+import net.dxs.xmpp.router.PacketRouter;
+import net.dxs.xmpp.session.ClientSession;
+import net.dxs.xmpp.session.Session;
 
 /**
  * 这类处理传入的XML节

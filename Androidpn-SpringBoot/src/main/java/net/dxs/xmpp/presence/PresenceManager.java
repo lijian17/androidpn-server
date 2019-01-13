@@ -17,10 +17,11 @@
  */
 package net.dxs.xmpp.presence;
 
-import org.androidpn.server.model.User;
-import org.androidpn.server.xmpp.session.ClientSession;
-import org.androidpn.server.xmpp.session.SessionManager;
 import org.xmpp.packet.Presence;
+
+import net.dxs.pojo.ApnUser;
+import net.dxs.xmpp.session.ClientSession;
+import net.dxs.xmpp.session.SessionManager;
 
 /**
  * 用户出席信息管理类
@@ -30,7 +31,7 @@ import org.xmpp.packet.Presence;
  */
 public class PresenceManager {
 
-    private SessionManager sessionManager;
+	private SessionManager sessionManager;
 
 	/**
 	 * 用户出席信息管理类
@@ -45,7 +46,7 @@ public class PresenceManager {
 	 * @param user
 	 * @return true：用户是可用的
 	 */
-	public boolean isAvailable(User user) {
+	public boolean isAvailable(ApnUser user) {
 		return sessionManager.getSession(user.getUsername()) != null;
 	}
 
@@ -55,7 +56,7 @@ public class PresenceManager {
 	 * @param user
 	 * @return
 	 */
-	public Presence getPresence(User user) {
+	public Presence getPresence(ApnUser user) {
 		if (user == null) {
 			return null;
 		}

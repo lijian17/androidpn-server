@@ -19,8 +19,6 @@ package net.dxs.xmpp.handler;
 
 import java.util.List;
 
-import javax.management.Notification;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xmpp.packet.JID;
@@ -28,6 +26,7 @@ import org.xmpp.packet.Packet;
 import org.xmpp.packet.PacketError;
 import org.xmpp.packet.Presence;
 
+import net.dxs.pojo.Notification;
 import net.dxs.service.NotificationService;
 import net.dxs.service.ServiceLocator;
 import net.dxs.xmpp.push.NotificationManager;

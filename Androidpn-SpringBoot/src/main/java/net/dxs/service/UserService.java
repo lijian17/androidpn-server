@@ -14,7 +14,9 @@ public interface UserService {
 
 	public ApnUser queryUserById(String userId);
 
-	public ApnUser getUserByUsername(String username);
+	public ApnUser getUserByUsername(String username) throws UserNotFoundException;
+
+	public List<ApnUser> getUsers();
 
 	public List<ApnUser> queryUserList(ApnUser user);
 
