@@ -85,8 +85,9 @@ public class XmppServer {
           //  locateServer();
             serverName = Config.getString("xmpp.domain", "127.0.0.1")
                     .toLowerCase();
+            log.info("加载Spring配置-start");
             context = new ClassPathXmlApplicationContext("spring-config.xml");
-			log.info("加载Spring配置.");
+			log.info("加载Spring配置-end");
 
 //            AdminConsole adminConsole = new AdminConsole(serverHomeDir);
 //            adminConsole.startup();

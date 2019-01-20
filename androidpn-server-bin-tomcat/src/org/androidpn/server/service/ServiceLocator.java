@@ -48,6 +48,7 @@ public class ServiceLocator {
 	 * @return
 	 */
     public static UserService getUserService() {
+		System.out.println("ServiceLocator-getUserService--------------------------");
         return (UserService) XmppServer.getInstance().getBean(USER_SERVICE);
     }
     
@@ -57,6 +58,7 @@ public class ServiceLocator {
      * @return
      */
     public static NotificationService getNotificationService() {
+		System.out.println("ServiceLocator-getNotificationService--------------------------");
     	return (NotificationService) XmppServer.getInstance().getBean(NOTIFICATION_SERVICE);
     }
 

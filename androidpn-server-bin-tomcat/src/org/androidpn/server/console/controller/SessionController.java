@@ -42,6 +42,7 @@ public class SessionController extends MultiActionController {
     //private UserService userService;
 
     public SessionController() {
+		logger.debug("SessionController-----------------------");
         //userService = ServiceLocator.getUserService();
     }
 

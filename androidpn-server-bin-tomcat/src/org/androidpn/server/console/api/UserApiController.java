@@ -28,6 +28,7 @@ public class UserApiController extends MultiActionController {
 	private UserService userService;
 
 	public UserApiController() {
+		logger.debug("UserApiController-----------------------");
 		userService = ServiceLocator.getUserService();
 	}
 

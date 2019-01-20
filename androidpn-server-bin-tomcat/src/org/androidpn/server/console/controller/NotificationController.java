@@ -47,6 +47,7 @@ public class NotificationController extends MultiActionController {
 	private NotificationManager notificationManager;
 
 	public NotificationController() {
+		logger.debug("NotificationController-----------------------");
 		notificationManager = new NotificationManager();
 	}
 

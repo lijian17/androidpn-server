@@ -40,6 +40,7 @@ public class UserController extends MultiActionController {
     private UserService userService;
 
     public UserController() {
+		logger.debug("UserController-----------------------");
         userService = ServiceLocator.getUserService();
     }
 

@@ -58,6 +58,7 @@ public class NotificationManager {
 	 * 推送通知管理器
 	 */
 	public NotificationManager() {
+		log.debug("NotificationManager----------------");
 		sessionManager = SessionManager.getInstance();
 		notificationService = ServiceLocator.getNotificationService();
 		userService = ServiceLocator.getUserService();
