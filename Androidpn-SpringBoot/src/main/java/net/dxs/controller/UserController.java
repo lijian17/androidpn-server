@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import net.dxs.pojo.ApnJSONResult;
 import net.dxs.pojo.ApnUser;
 import net.dxs.service.UserService;
+import net.dxs.xmpp.presence.PresenceManager;
 
 /**
  * 控制器-处理与用户相关请求
@@ -73,6 +74,14 @@ public class UserController {
 	public ApnJSONResult queryUserList() {
 		ApnUser user = new ApnUser();
 		List<ApnUser> userList = userService.queryUserList(user);
+		PresenceManager presenceManager = new PresenceManager();
+		for (ApnUser apnUser : userList) {
+			if (presenceManager.isAvailable(apnUser)) {
+				apnUser.setOnline(true);
+			} else {
+				apnUser.setOnline(false);
+			}
+		}
 		return ApnJSONResult.ok(userList);
 	}
 
