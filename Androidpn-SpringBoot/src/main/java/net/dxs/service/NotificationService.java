@@ -19,6 +19,8 @@ package net.dxs.service;
 
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import net.dxs.pojo.Notification;
 
 

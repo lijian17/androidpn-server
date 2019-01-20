@@ -17,7 +17,7 @@ import net.dxs.service.UserNotFoundException;
 import net.dxs.service.UserService;
 import tk.mybatis.mapper.entity.Example;
 
-@Service
+@Service("userService")
 public class UserServiceImpl implements UserService {
 
 	@Autowired

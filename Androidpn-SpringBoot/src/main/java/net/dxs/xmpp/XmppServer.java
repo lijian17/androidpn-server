@@ -21,8 +21,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.thymeleaf.spring5.context.SpringContextUtils;
 
 import net.dxs.utils.Config;
+import net.dxs.utils.SpringUtil;
 import net.dxs.xmpp.session.SessionManager;
 
 /**
@@ -33,60 +35,60 @@ import net.dxs.xmpp.session.SessionManager;
  */
 public class XmppServer {
 
-    private static final Log log = LogFactory.getLog(XmppServer.class);
+	private static final Log log = LogFactory.getLog(XmppServer.class);
 
-    private static XmppServer instance;
+	private static XmppServer instance;
 
 	/** Spring上下文对象 */
-    private ApplicationContext context;
+	private ApplicationContext context;
 
 	/** Androidpn Server 版本号 */
-    private String version = "0.5.0";
+	private String version = "0.5.0";
 
-    private String serverName;
+	private String serverName;
 
-    private String serverHomeDir;
+	private String serverHomeDir;
 
-    private boolean shuttingDown;
+	private boolean shuttingDown;
 
 	/**
 	 * 获得XmppServer实例（单例模式）
 	 * 
 	 * @return
 	 */
-    public static XmppServer getInstance() {
-        if (instance == null) {
-            synchronized (XmppServer.class) {
-                instance = new XmppServer();
-            }
-        }
-        return instance;
-    }
+	public static XmppServer getInstance() {
+		if (instance == null) {
+			synchronized (XmppServer.class) {
+				instance = new XmppServer();
+			}
+		}
+		return instance;
+	}
 
 	/**
 	 * 构造函数：创建一个服务并启动他
 	 */
-    public XmppServer() {
-        if (instance != null) {
+	public XmppServer() {
+		if (instance != null) {
 			throw new IllegalStateException("服务已经是运行的");
-        }
-        instance = this;
-        start();
-    }
+		}
+		instance = this;
+		start();
+	}
 
 	/**
 	 * 使用Spring配置启动服务
 	 */
-    public void start() {
-        try {
-            if (isStandAlone()) {
-                Runtime.getRuntime().addShutdownHook(new ShutdownHookThread());
-            }
+	public void start() {
+		try {
+			if (isStandAlone()) {
+				Runtime.getRuntime().addShutdownHook(new ShutdownHookThread());
+			}
 
-          //  locateServer();
-            serverName = Config.getString("xmpp.domain", "127.0.0.1")
-                    .toLowerCase();
+			// locateServer();
+			serverName = Config.getString("xmpp.domain", "127.0.0.1").toLowerCase();
 //            context = new ClassPathXmlApplicationContext("spring-config.xml");
+			context = SpringUtil.getApplicationContext();
 			log.info("加载Spring配置.");
 
 //            AdminConsole adminConsole = new AdminConsole(serverHomeDir);
@@ -96,155 +98,136 @@ public class XmppServer {
 //                        + adminConsole.getAdminHost() + ":"
 //                        + adminConsole.getAdminPort());
 //            }
-            log.info("XmppServer started: " + serverName);
-            log.info("Androidpn Server v" + version);
+			log.info("XmppServer started: " + serverName);
+			log.info("Androidpn Server v" + version);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            shutdownServer();
-        }
-    }
+		} catch (Exception e) {
+			e.printStackTrace();
+			shutdownServer();
+		}
+	}
 
 	/**
 	 * 停止服务
 	 */
-    public void stop() {
-        shutdownServer();
-        Thread shutdownThread = new ShutdownThread();
-        shutdownThread.setDaemon(true);
-        shutdownThread.start();
-    }
+	public void stop() {
+		shutdownServer();
+		Thread shutdownThread = new ShutdownThread();
+		shutdownThread.setDaemon(true);
+		shutdownThread.start();
+	}
 
-    /**
+	/**
 	 * 根据beanName获取一个Spring 的bean
 	 * 
 	 * @param beanName
 	 * @return a Srping bean
 	 */
-    public Object getBean(String beanName) {
-        return context.getBean(beanName);
-    }
+	public Object getBean(String beanName) {
+		return context.getBean(beanName);
+	}
 
 	/**
 	 * 获得server name.
 	 * 
 	 * @return
 	 */
-    public String getServerName() {
-        return serverName;
-    }
+	public String getServerName() {
+		return serverName;
+	}
 
-    /**
+	/**
 	 * 服务器当前状态
 	 * 
 	 * @return true：服务当前正在关闭，false：otherwise
 	 */
-    public boolean isShuttingDown() {
-        return shuttingDown;
-    }
+	public boolean isShuttingDown() {
+		return shuttingDown;
+	}
 
-    /**
+	/**
 	 * 服务是否是单例模式运行
 	 * 
 	 * @return true：单例模式；false：非单例模式
 	 */
-    public boolean isStandAlone() {
-        boolean standalone;
-        try {
-            standalone = Class
-                    .forName("org.androidpn.server.starter.ServerStarter") != null;
-        } catch (ClassNotFoundException e) {
-            standalone = false;
-        }
-        return standalone;
-    }
+	public boolean isStandAlone() {
+		boolean standalone;
+		try {
+			standalone = Class.forName("org.androidpn.server.starter.ServerStarter") != null;
+		} catch (ClassNotFoundException e) {
+			standalone = false;
+		}
+		return standalone;
+	}
 
 	/**
 	 * 定位服务
 	 * 
 	 * @throws FileNotFoundException
 	 *//*
-    private void locateServer() throws FileNotFoundException {
-
-		String path = XmppServer.class.getResource("/").getPath();
-		log.debug("locateServer-path=" + path);
-		
-		String baseDir;
-		if (path.contains("target")) {// 开发环境路径
-			// String baseDir = System.getProperty("base.dir", "..");
-			baseDir = System.getProperty("user.dir", "..");
-			baseDir = baseDir + File.separatorChar + "src" + File.separatorChar
-					+ "main" + File.separatorChar + "resources";
-		} else {// 生产环境路径
-			String websiteURL = path.replace("/build/classes", "")
-					.replace("/classes", "").replace("%20", " ")
-					.replaceFirst("/", "");
-			log.debug("locateServer-websiteURL=" + websiteURL);
-			baseDir = websiteURL;
-		}
-	
-		log.debug("base.dir=" + baseDir);
-		
-//    	Context context = new WebAppContext(contexts, homeDir + File.separator
-//                + );
-//        String baseDir = "F:/Java���/Ӧ�����/Tomcat 6.0/webapps/ROOT";
-//        log.debug("base.dir=" + baseDir);
-
-        if (serverHomeDir == null) {
-            try {
-                File confDir = new File(baseDir, "conf");
-                if (confDir.exists()) {
-                    serverHomeDir = confDir.getParentFile().getCanonicalPath();
-                }
-            } catch (FileNotFoundException fe) {
-                // Ignore
-            } catch (IOException ie) {
-                // Ignore
-            }
-        }
-
-        if (serverHomeDir == null) {
-            System.err.println("Could not locate home.");
-            throw new FileNotFoundException();
-        } else {
-            Config.setProperty("server.home.dir", serverHomeDir);
-            log.debug("server.home.dir=" + serverHomeDir);
-        }
-    }*/
+		 * private void locateServer() throws FileNotFoundException {
+		 * 
+		 * String path = XmppServer.class.getResource("/").getPath();
+		 * log.debug("locateServer-path=" + path);
+		 * 
+		 * String baseDir; if (path.contains("target")) {// 开发环境路径 // String baseDir =
+		 * System.getProperty("base.dir", ".."); baseDir =
+		 * System.getProperty("user.dir", ".."); baseDir = baseDir + File.separatorChar
+		 * + "src" + File.separatorChar + "main" + File.separatorChar + "resources"; }
+		 * else {// 生产环境路径 String websiteURL = path.replace("/build/classes", "")
+		 * .replace("/classes", "").replace("%20", " ") .replaceFirst("/", "");
+		 * log.debug("locateServer-websiteURL=" + websiteURL); baseDir = websiteURL; }
+		 * 
+		 * log.debug("base.dir=" + baseDir);
+		 * 
+		 * // Context context = new WebAppContext(contexts, homeDir + File.separator //
+		 * + ); // String baseDir = "F:/Java���/Ӧ�����/Tomcat 6.0/webapps/ROOT"; //
+		 * log.debug("base.dir=" + baseDir);
+		 * 
+		 * if (serverHomeDir == null) { try { File confDir = new File(baseDir, "conf");
+		 * if (confDir.exists()) { serverHomeDir =
+		 * confDir.getParentFile().getCanonicalPath(); } } catch (FileNotFoundException
+		 * fe) { // Ignore } catch (IOException ie) { // Ignore } }
+		 * 
+		 * if (serverHomeDir == null) { System.err.println("Could not locate home.");
+		 * throw new FileNotFoundException(); } else {
+		 * Config.setProperty("server.home.dir", serverHomeDir);
+		 * log.debug("server.home.dir=" + serverHomeDir); } }
+		 */
 
 	/**
 	 * 关闭服务器
 	 */
-    private void shutdownServer() {
-        shuttingDown = true;
+	private void shutdownServer() {
+		shuttingDown = true;
 		// 关闭所有连接
-        SessionManager.getInstance().closeAllSessions();
-        log.info("XmppServer stopped");
-    }
+		SessionManager.getInstance().closeAllSessions();
+		log.info("XmppServer stopped");
+	}
 
-    private class ShutdownHookThread extends Thread {
-        public void run() {
-            shutdownServer();
+	private class ShutdownHookThread extends Thread {
+		public void run() {
+			shutdownServer();
 			log.info("Server 停止");
 			System.err.println("Server 停止");
-        }
-    }
+		}
+	}
 
-    /**
-     * 关闭线程
-     * 
-     * @author lijian
-     * @date 2016-12-3 下午11:56:08
-     */
-    private class ShutdownThread extends Thread {
-        public void run() {
-            try {
-                Thread.sleep(5000);
-                System.exit(0);// 0正常关闭当前运行的Java虚拟机
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-        }
-    }
+	/**
+	 * 关闭线程
+	 * 
+	 * @author lijian
+	 * @date 2016-12-3 下午11:56:08
+	 */
+	private class ShutdownThread extends Thread {
+		public void run() {
+			try {
+				Thread.sleep(5000);
+				System.exit(0);// 0正常关闭当前运行的Java虚拟机
+			} catch (InterruptedException e) {
+				// Ignore
+			}
+		}
+	}
 
 }

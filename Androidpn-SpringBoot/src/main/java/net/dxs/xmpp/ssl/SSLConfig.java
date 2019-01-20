@@ -72,6 +72,8 @@ public class SSLConfig {
     }
 
     static {
+        classPath = SSLConfig.class.getResource("/");
+        
 		// 加载配置文件信息（见：config.properties）
         storeType = Config.getString("xmpp.ssl.storeType", "JKS");
         keyStoreLocation = Config.getString("xmpp.ssl.keystore", "conf"
@@ -84,8 +86,6 @@ public class SSLConfig {
         trustStoreLocation = classPath.getPath()
                 + File.separator + trustStoreLocation;
         trustPass = Config.getString("xmpp.ssl.trustpass", "changeit");
-        
-        classPath = SSLConfig.class.getResource("/");
 
         log.debug("keyStoreLocation=" + keyStoreLocation);
         log.debug("trustStoreLocation=" + trustStoreLocation);
