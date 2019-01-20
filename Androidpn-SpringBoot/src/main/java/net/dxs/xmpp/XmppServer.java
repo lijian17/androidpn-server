@@ -20,8 +20,6 @@ package net.dxs.xmpp;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.thymeleaf.spring5.context.SpringContextUtils;
 
 import net.dxs.utils.Config;
 import net.dxs.utils.SpringUtil;
