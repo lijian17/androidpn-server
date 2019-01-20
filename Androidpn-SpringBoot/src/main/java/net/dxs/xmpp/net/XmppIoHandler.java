@@ -74,7 +74,7 @@ public class XmppIoHandler implements IoHandler {
 	/**
 	 * 创建一个新的会话，并销毁之前的。收到XML节点StanzaHandler
 	 */
-	protected XmppIoHandler() {
+	public XmppIoHandler() {
 		serverName = XmppServer.getInstance().getServerName();
 	}
 

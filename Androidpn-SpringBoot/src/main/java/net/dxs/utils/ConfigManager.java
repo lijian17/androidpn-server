@@ -18,7 +18,7 @@
 package net.dxs.utils;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationFactory;
+import org.apache.commons.configuration.DefaultConfigurationBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -69,7 +69,7 @@ public class ConfigManager {
 	 */
     public void loadConfig(String configFileName) {
 		try {
-			ConfigurationFactory factory = new ConfigurationFactory(
+			DefaultConfigurationBuilder factory = new DefaultConfigurationBuilder(
 					configFileName);
 			config = factory.getConfiguration();
 			log.info("加载配置文件: " + configFileName);
