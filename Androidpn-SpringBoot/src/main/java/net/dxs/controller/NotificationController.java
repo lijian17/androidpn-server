@@ -6,20 +6,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import net.dxs.utils.Config;
 import net.dxs.xmpp.push.NotificationManager;
@@ -43,78 +38,50 @@ public class NotificationController {
 	}
 
 	@RequestMapping(value = "send", method = RequestMethod.POST)
-	public String send(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		String broadcast = null;
-		String username = null;
-		String alias = null;
-		String tag = null;
-		String title = null;
-		String message = null;
-		String uri = null;
-		String imageUrl = null;
-
+	public String send(@RequestParam("broadcast") String broadcast, @RequestParam("username") String username,
+			@RequestParam("alias") String alias, @RequestParam("tag") String tag, @RequestParam("title") String title,
+			@RequestParam("message") String message, @RequestParam("uri") String uri,
+			@RequestParam("image") MultipartFile image) throws Exception {
 		String apiKey = Config.getString("apiKey", "");
 		log.debug("apiKey=" + apiKey);
 
-		DiskFileItemFactory factory = new DiskFileItemFactory();
-		ServletFileUpload servletFileUpload = new ServletFileUpload(factory);
-		List<FileItem> fileItem = servletFileUpload.parseRequest(request);
-		for (FileItem item : fileItem) {
-			if ("broadcast".equals(item.getFieldName())) {
-				broadcast = item.getString("utf-8");
-			} else if ("username".equals(item.getFieldName())) {
-				username = item.getString("utf-8");
-			} else if ("alias".equals(item.getFieldName())) {
-				alias = item.getString("utf-8");
-			} else if ("tag".equals(item.getFieldName())) {
-				tag = item.getString("utf-8");
-			} else if ("title".equals(item.getFieldName())) {
-				title = item.getString("utf-8");
-			} else if ("message".equals(item.getFieldName())) {
-				message = item.getString("utf-8");
-			} else if ("uri".equals(item.getFieldName())) {
-				uri = item.getString("utf-8");
-			} else if ("image".equals(item.getFieldName())) {
-				imageUrl = uploadImage(request, item);
-			}
+		String imageUrl = uploadImage(image);
 
-			if (broadcast.equals("0")) {
-				notificationManager().sendBroadcast(apiKey, title, message, uri, imageUrl);
-			} else if (broadcast.equals("1")) {
-				notificationManager().sendNotifcationToUser(apiKey, username, title, message, uri, imageUrl, true);
-			} else if (broadcast.equals("2")) {
-				notificationManager().sendNotificationByAlias(apiKey, alias, title, message, uri, imageUrl, true);
-			} else if (broadcast.equals("3")) {
-				notificationManager().sendNotificationByTag(apiKey, tag, title, message, uri, imageUrl, true);
-			}
+		if (broadcast.equals("0")) {
+			notificationManager().sendBroadcast(apiKey, title, message, uri, imageUrl);
+		} else if (broadcast.equals("1")) {
+			notificationManager().sendNotifcationToUser(apiKey, username, title, message, uri, imageUrl, true);
+		} else if (broadcast.equals("2")) {
+			notificationManager().sendNotificationByAlias(apiKey, alias, title, message, uri, imageUrl, true);
+		} else if (broadcast.equals("3")) {
+			notificationManager().sendNotificationByTag(apiKey, tag, title, message, uri, imageUrl, true);
 		}
 
-		return "redirect:/";
+		return null;
 	}
 
 	/**
 	 * 上传图片，并返回对应图片的访问地址
 	 * 
-	 * @param request
-	 * @param fileItem
+	 * @param image
 	 * @return
 	 * @throws IOException
 	 */
-	private String uploadImage(HttpServletRequest request, FileItem fileItem) throws IOException {
+	private String uploadImage(MultipartFile image) throws IOException {
 		// 将获得一个磁盘路径
-		String uploadPath = SSLConfig.class.getResource("/").getPath();
+		String uploadPath = "D:/GitHub/html/upload";
 		File uploadDir = new File(uploadPath);
 		// 如果文件目录不存在，则创建之
 		if (!uploadDir.exists()) {
 			uploadDir.mkdirs();
 		}
 		// 图片类型的文件，其他类型的不以处理
-		if (fileItem != null && fileItem.getContentType().startsWith("image")) {
+		if (image != null && image.getContentType().startsWith("image")) {
 			// 获得文件后缀名
-			String suffix = fileItem.getName().substring(fileItem.getName().lastIndexOf("."));
+			String suffix = image.getOriginalFilename().substring(image.getOriginalFilename().lastIndexOf("."));
 			// 为保证图片名称唯一性，在前面拼接当前时间
-			String fileName = fileItem.getName().replace(suffix, getFormatNowDate() + suffix);
-			InputStream is = fileItem.getInputStream();
+			String fileName = image.getOriginalFilename().replace(suffix, getFormatNowDate() + suffix);
+			InputStream is = image.getInputStream();
 			FileOutputStream fos = new FileOutputStream(uploadPath + "/" + fileName);
 			byte[] b = new byte[1024];
 			int len = 0;
@@ -124,11 +91,15 @@ public class NotificationController {
 			}
 			fos.close();
 			is.close();
+//			// 当前服务器域名
+//			String serverName = request.getServerName();
+//			// 端口号
+//			int serverPort = request.getServerPort();
 			// 当前服务器域名
-			String serverName = request.getServerName();
+			String serverName = "192.168.0.125";
 			// 端口号
-			int serverPort = request.getServerPort();
-			String imageUrl = "http://" + serverName + ":" + serverPort + "/upload/" + fileName;
+			int serverPort = 80;
+			String imageUrl = "http://" + serverName + ":" + serverPort + "/html/upload/" + fileName;
 			System.out.println("imageUrl:" + imageUrl);
 			return imageUrl;
 		}
